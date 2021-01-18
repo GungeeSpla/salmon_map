@@ -771,6 +771,8 @@ function autosave() {
 function clearCanvas() {
 	$('#layer-item').empty();
 	$('#layer-steeleel .stage-object,#layer-steelhead .stage-object').remove();
+	steelheadCtx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_WIDTH);
+	steeleelCtx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
 }
 
 /** clearStage()
@@ -785,8 +787,6 @@ function clearStage() {
 		transformOrigin: 'center',
 		transform: `translate(-50%, -50%)`
 	});
-	steelheadCtx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_WIDTH);
-	steeleelCtx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
 }
 
 /** loadStage(options)
