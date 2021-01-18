@@ -778,6 +778,7 @@ function clearCanvas() {
 /** clearStage()
  */
 function clearStage() {
+	$('.drizzler-container').remove();
 	$('.stage-object').remove();
 	$('#canvas-rail').remove();
 	clearCanvas();
@@ -822,7 +823,10 @@ function loadStage(options) {
 
 	// XMLファイルの読み込み
 	stageObjectsReady = false;
-	$.loadXML(`./assets/xml/${options.stage}.xml`).then(readXML);
+	$.loadXML(`./assets/xml/${options.stage}.xml`).then((data) => {
+		readXML(data);
+		if (options.onloadxml) options.onloadxml();
+	});
 
 	/** ステージ画像 */
 	$('#stage-image').attr('src', `./assets/img/stage/${options.maptype}/${options.stage}-${options.tide}.png`).css('display', 'block');

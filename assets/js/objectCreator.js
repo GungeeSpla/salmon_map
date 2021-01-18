@@ -89,9 +89,9 @@ const objectCreater = {
 			return null;
 		}
 		const [x, z] = convert(obj.tx, obj.tz);
-		const $obj = $('<input type="checkbox" id="'+obj.id+'"><label class="stage-object drizzler" for="'+obj.id+'"></label><div></div>');
-		$obj.filter('label').css({ left: `${x}px`, top: `${z}px` });
-		$obj.filter('div').css({ left: `${x}px`, top: `${z}px` });
+		const $obj = $('<div class="drizzler-container"><input type="checkbox" id="'+obj.id+'"><label class="stage-object drizzler" for="'+obj.id+'"></label><div></div></div>');
+		$obj.find('label').css({ left: `${x}px`, top: `${z}px` });
+		$obj.find('div').css({ left: `${x}px`, top: `${z}px` });
 		return $obj;
 	},
 	/** コンテナ

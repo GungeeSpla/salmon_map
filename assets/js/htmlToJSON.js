@@ -29,6 +29,16 @@ function readJSON(json) {
 			$(elm).prop('checked', Boolean(json.ol[key])).myTrigger('change');
 		});
 	}
+
+	/** コウモリ */
+	if (json.dz) {
+		ncs.onloadxml = () => {
+			json.dz.forEach((def) => {
+				$('#'+def[0]).prop('checked', !!def[1]);
+			});
+		};
+	}
+
 	loadStage(ncs);
 
 	/** ヘビ */
@@ -197,6 +207,16 @@ function htmlToJSON() {
 		ol[sid] = bool;
 	});
 	json.ol = ol;
+
+	/** コウモリ */
+	const dz = [];
+	$('#layer-drizzler .drizzler-container').each((i, elm) => {
+		const poses = [];
+		const id = $(elm).find('input').attr('id');
+		const checked = $(elm).find('input').prop('checked') ? 1 : 0;
+		dz.push([id, checked]);
+	});
+	if (dz.length) json.dz = dz;
 
 	/** ヘビ */
 	const se = [];

@@ -2,7 +2,7 @@
 // constants.js
 // =========================================================
 
-const VERSION = '0.1.2';
+const VERSION = '0.1.3';
 const STORAGE_KEY = 'salmon_map';
 const STORAGE_KEY_AUTOSAVE = 'salmon_map_autosave';
 const STORAGE_KEY_JSONSAVE = 'salmon_map_jsonsave';

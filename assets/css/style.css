@@ -294,6 +294,11 @@ h2 {
 			transform: translate(-50%, -50%) rotate(calc(0deg - var(--stage-rotate)));
 		}
 		/** コウモリ */
+		#layer-drizzler > div {
+			position: absolute;
+			left: 0;
+			top: 0;
+		}
 		#layer-drizzler input {
 			display: none;
 		}
@@ -314,7 +319,7 @@ h2 {
 		#layer-drizzler label:hover {
 			transform: translate(-50%, -50%) rotate(calc(0deg - var(--stage-rotate))) scale(1.3);
 		}
-		#layer-drizzler div {
+		#layer-drizzler input ~ div {
 			position: absolute;
 			left: 0;
 			top: 0;
@@ -329,7 +334,7 @@ h2 {
 			transition: all 300ms ease;
 			z-index: 1;
 		}
-		#layer-drizzler input:checked + label + div {
+		#layer-drizzler input:checked ~ div {
 			transform: translate(-50%, -50%) scale(1);
 		}
 		/** ヘビ */
