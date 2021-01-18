@@ -1,0 +1,362 @@
+/** readJSON(json)
+ */
+function readJSON(json) {
+	console.log('loading json...');
+	console.log(json);
+	isEnabledAutosave = false;
+
+	/** キャンバス設定 */
+	const ncs = {
+		maptype     : json.cs.mt,
+		stage       : json.cs.st,
+		tide        : json.cs.td,
+		canvasColor : json.cs.cc,
+		canvasWidth : json.cs.cw,
+		canvasHeight: json.cs.ch,
+		stageX      : json.cs.sx,
+		stageY      : json.cs.sy,
+		stageScale  : json.cs.ss,
+		stageRotate : json.cs.sr,
+	};
+	$.extend(canvasSetting, ncs);
+	$('#radio-' + ncs.stage).prop('checked', true);
+	$('#radio-' + ncs.tide).prop('checked', true);
+	$('#radio-' + ncs.maptype).prop('checked', true);
+
+	/** オブジェクトレイヤー */
+	for (let key in json.ol) {
+		$(`#checkbox-layer-${key}`).each((i, elm) => {
+			$(elm).prop('checked', Boolean(json.ol[key])).myTrigger('change');
+		});
+	}
+	loadStage(ncs);
+
+	/** ヘビ */
+	if (json.se) {
+		json.se.forEach((nodePositions) => {
+			addSteelEel({ nodePositions });
+		});
+	}
+
+	/** バクダン */
+	if (json.sh) {
+		json.sh.forEach((def) => {
+			addSteelheadCircle({
+				x   : def.x,
+				y   : def.y,
+				type: def.t
+			});
+		});
+	}
+
+	/** ブキ */
+	if (json.wl) {
+		json.wl.forEach((def) => {
+			addWeapon({
+				id                 : def.id,
+				x                  : def.x,
+				y                  : def.y,
+				width              : def.w,
+				height             : def.h,
+				initialVisibleRange: def.rv,
+				initialRotate      : def.r,
+				initialRotateRange : def.rr
+			});
+		});
+	}
+
+	/** 画像 */
+	if (json.il) {
+		json.il.forEach((def) => {
+			addImage({
+				src                : def.src,
+				x                  : def.x,
+				y                  : def.y,
+				width              : def.w,
+				height             : def.h,
+				initialRotate      : def.r
+			});
+		});
+	}
+
+	/** テキスト */
+	if (json.tl) {
+		json.tl.forEach((def) => {
+			addTextarea({
+				text               : def.text,
+				x                  : def.x,
+				y                  : def.y,
+				fontSize           : def.s,
+				initialRotate      : def.r,
+				textColor          : def.c,
+				borderColor        : def.b,
+				fontFamily         : def.f
+			});
+		});
+	}
+
+	const dl = [];
+	if (json.dl) {
+		json.dl.forEach((def) => {
+			if (def.pm.verticesList) {
+				const newVerticesList = [];
+				def.pm.verticesList.forEach((verticesStr) => {
+					const arr = [], varr = [];
+					let bstr = '', bx, by;
+					for (let i = 0; i < verticesStr.length; i++) {
+						const chr = verticesStr[i];
+						const isnum = !!chr.match(/[0-9\.\-]/);
+						if (isnum) {
+							bstr += chr;
+						} else {
+							if (bstr) {
+								const num = parseInt(bstr);
+								arr.push(num);
+								bstr = '';
+							}
+							if (chr !== ',') {
+								const num = alphabetToNumber(chr);
+								arr.push(num);
+							}
+						}
+					}
+					for (let i = 0; i < arr.length; i += 2) {
+						const tx = arr[i + 0], ty = arr[i + 1];
+						let x, y;
+						if (i === 0) {
+							x = tx;
+							y = ty;
+						} else {
+							x = bx + tx;
+							y = by + ty;
+						}
+						bx = x;
+						by = y;
+						varr.push({ x, y });
+					}
+					newVerticesList.push(varr);
+				});
+				def.pm.verticesList = newVerticesList;
+			}
+			if (def.pm.ts) {
+				def.pm.toolSetting = {
+					lineWidth  : def.pm.ts.lw,
+					lineColor  : def.pm.ts.lc,
+					borderWidth: def.pm.ts.bw,
+					borderColor: def.pm.ts.bc,
+					fillColor  : def.pm.ts.fc
+				};
+			}
+			determineDrawingCommon({
+				params       : def.pm,
+				x            : def.x,
+				y            : def.y,
+				width        : def.w,
+				height       : def.h,
+				initialRotate: def.r,
+				minX         : def.mx,
+				minY         : def.my,
+				initialWidth : def.iw,
+				toolType     : def.tt,
+				isJSON       : true
+			});
+		});
+	}
+
+	isEnabledAutosave = true;
+}
+
+/** htmlToJSON()
+ */
+function htmlToJSON() {
+	const json = {};
+	const cs = canvasSetting; 
+	json.cs = {
+		mt: cs.maptype,
+		st: cs.stage,
+		td: cs.tide,
+		cc: cs.canvasColor,
+		cw: cs.canvasWidth,
+		ch: cs.canvasHeight,
+		sx: cs.stageX,
+		sy: cs.stageY,
+		ss: cs.stageScale,
+		sr: cs.stageRotate
+	};
+
+	/** オブジェクトレイヤー */
+	const ol = {};
+	$('#object-layer-manager input').each((i, elm) => {
+		const id = $(elm).attr('id');
+		const sid = id.replace('checkbox-layer-', '');
+		const bool = $(elm).prop('checked') ? 1 : 0;
+		ol[sid] = bool;
+	});
+	json.ol = ol;
+
+	/** ヘビ */
+	const se = [];
+	$('#layer-steeleel .stage-object.eel').each((i, elm) => {
+		const poses = [];
+		$(elm).find('.stage-object-eel-node').each((j, node) => {
+			const pos = $(node).getXY();
+			const rotate = $(node).elmvar('rotate');
+			poses.push({
+				x: parseInt(pos.x),
+				y: parseInt(pos.y),
+				r: parseInt(rotate)
+			});
+		});
+		se.push(poses);
+	});
+	if (se.length) json.se = se;
+
+	/** バクダン */
+	const sh = [];
+	$('#layer-steelhead .steelhead').each((i, elm) => {
+		const pos = $(elm).getXY();
+		const type = parseInt($(elm).attr('data-type'));
+		sh.push({
+			x: parseInt(pos.x),
+			y: parseInt(pos.y),
+			t: type 
+		});
+	});
+	if (sh.length) json.sh = sh;
+
+	/** ブキ */
+	const wl = [];
+	$('#layer-weapon .weapon-container').each((i, elm) => {
+		const $elm = $(elm);
+		const id = parseInt($elm.attr('data-weapon-id'));
+		const pos = $elm.getXY();
+		const size = $elm.getWH();
+		const rotate = $elm.elmvar('rotate');
+		const $range = $elm.find('.range-container');
+		const isRangeVisible = ($range.css('display') !== 'none') ? 1 : 0;
+		const rangeRotate = $range.elmvar('rotate');
+		const data = {
+			id: id,
+			x: pos.x,
+			y: pos.y,
+			w: size.width,
+			h: size.height,
+			r: rotate,
+			rv: isRangeVisible,
+			rr: rangeRotate
+		};
+		wl.push(data);
+	});
+	if (wl.length) json.wl = wl;
+
+	/** 画像 */
+	const il = [];
+	$('#layer-image .image-container').each((i, elm) => {
+		const $elm = $(elm);
+		const src = $elm.find('img').attr('src');
+		const id = parseInt($elm.attr('data-weapon-id'));
+		const pos = $elm.getXY();
+		const size = $elm.getWH();
+		const rotate = $elm.elmvar('rotate');
+		const data = {
+			src: src,
+			x: pos.x,
+			y: pos.y,
+			w: size.width,
+			h: size.height,
+			r: rotate
+		};
+		il.push(data);
+	});
+	if (il.length) json.il = il;
+
+	/** テキスト */
+	const tl = [];
+	$('#layer-text .textarea-container').each((i, elm) => {
+		const $elm = $(elm);
+		const $text = $elm.find('textarea');
+		const text = $text.val();
+		const pos = $elm.getXY();
+		const options = $text.elmvar('options');
+		const size = parseFloat($text.css('font-size'));
+		const rotate = parseInt($elm.elmvar('rotate'));
+		const data = {
+			t: text,
+			x: parseInt(pos.x),
+			y: parseInt(pos.y),
+			s: size,
+			r: rotate,
+			f: options.fontFamily,
+			c: options.textColor,
+			b: options.borderColor
+		};
+		tl.push(data);
+	});
+	if (tl.length) json.tl = tl;
+
+	/** 図形 */
+	const dl = [];
+	$('#layer-drawing .drawing-container').each((i, elm) => {
+		const $elm = $(elm);
+		const options = $.extend(true, {}, $elm.elmvar('options'));
+		const params = options.params;
+		const rotate = $elm.elmvar('rotate');
+		const pos = $elm.getXY();
+		const size = $elm.getWH();
+		if (options.toolType === 'pencil') {
+			const newVerticesList = [];
+			params.verticesList.forEach((vertices) => {
+				let str = '', bx, by, bc;
+				vertices.forEach((v, i) => {
+					if (i === 0) {
+						str += v.x + ',' + v.y
+						bc = v.y;
+					} else {
+						const dx = v.x - bx;
+						const dy = v.y - by;
+						const dxb = (-25 <= dx && dx <= 26);
+						const dyb = (-25 <= dy && dy <= 26);
+						const dxc = dxb ? numberToAlphabet(dx) : dx;
+						const dyc = dyb ? numberToAlphabet(dy) : dy;
+						if (typeof bc === 'number' && typeof dxc === 'number') str += ',';
+						str += dxc;
+						bc = dxc;
+						if (typeof bc === 'number' && typeof dyc === 'number') str += ',';
+						str += dyc;
+						bc = dyc;
+					}
+					bx = v.x;
+					by = v.y;
+				});
+				newVerticesList.push(str);
+			});
+			params.verticesList = newVerticesList;
+		}
+		if (params.toolSetting) {
+			params.ts = {
+				lw: params.toolSetting.lineWidth,
+				lc: params.toolSetting.lineColor,
+				bw: params.toolSetting.borderWidth,
+				bc: params.toolSetting.borderColor,
+				fc: params.toolSetting.fillColor
+			};
+			delete params.toolSetting;
+		}
+		const data = {
+			x: pos.x,
+			y: pos.y,
+			w: size.width,
+			h: size.height,
+			r: rotate,
+			pm: params,
+			mx: options.minX,
+			my: options.minY,
+			iw: options.initialWidth,
+			tt: options.toolType
+		};
+		dl.push(data);
+	});
+	if (dl.length) json.dl = dl;
+
+	return json;
+}

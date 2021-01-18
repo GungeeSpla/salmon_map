@@ -1,0 +1,1048 @@
+html {
+	--color-background: #333;
+	--color-text: #eee;
+	--color-shadow: rgba(255, 255, 255, .2);
+	--color-background: #eee;
+	--color-text: #333;
+	--color-shadow: rgba(0, 0, 0, .2);
+	--color-theme-1: rgb(244, 57, 64);
+	--color-theme-1-a: rgba(244, 57, 64, .5);
+	--color-theme-1-b: rgba(244, 57, 64, .1);
+	--color-theme-1-c: rgb(216, 37, 44);
+	--stage-rotate: 0deg;
+}
+body, div, p, span, h1, h2, h3, h4, h5, input {
+	margin: 0;
+	padding: 0;
+}
+body {
+	background: var(--color-background);
+	color: var(--color-text);
+}
+body, input, select {
+	font-family: "Helvetica Neue", Arial,"Hiragino Kaku Gothic ProN", "Hiragino Sans", "BIZ UDPGothic", Meiryo, sans-serif;
+}
+select {
+	font-size: 16px;
+}
+.font-sans-serif {
+	font-family: "Helvetica Neue", Arial,"Hiragino Kaku Gothic ProN", "Hiragino Sans", "BIZ UDPGothic", Meiryo, sans-serif;
+	font-weight: bold;
+}
+.font-serif {
+	font-family: "游明朝", YuMincho, "Hiragino Mincho ProN W3", "ヒラギノ明朝 ProN W3", "Hiragino Mincho ProN", "HG明朝E", "ＭＳ Ｐ明朝", "ＭＳ 明朝", serif;
+}
+.font-splatoon1 {
+	font-family: Splatoon1;
+}
+.font-splatoon2 {
+	font-family: Splatoon2;
+}
+.text-sep {
+	color: #11782e;
+	padding: 0 8px;
+}
+h1 {
+	text-align: center;
+	font-weight: bold;
+	font-size: 24px;
+	line-height: 100%;
+	padding-top: 18px;
+	padding-bottom: 18px;
+	color: white;
+	background: #11782e;
+	font-family: Splatoon1,sans-serif;
+	background-image: url(../img/css/title-background.png);
+	background-size: 80px 80px;
+	text-shadow: 1px 1px 0 #000;
+}
+h2 {
+	text-align: center;
+	font-weight: bold;
+	font-size: 30px;
+	line-height: 100%;
+	padding-top: 30px;
+	padding-bottom: 30px;
+}
+/** キャンバスエリア */
+#canvas-area {
+	position: relative;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	user-select: none;
+}
+/** ボタンエリア */
+#button-area {
+	position: relative;
+	/*
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	*/
+	text-align: center;
+	user-select: none;
+	padding-top: 20px;
+	padding-bottom: 20px;
+}
+	button {
+		display: inline-block;
+		border: 2px solid var(--color-theme-1);
+		color: var(--color-theme-1);
+		text-decoration: none;
+		border-radius: 4px;
+		transition: .2s;
+		cursor: pointer;
+		outline: none;
+		text-align: center;
+		font-weight: bold;
+		font-size: 16px;
+		line-height: 100%;
+		width: 200px;
+		height: auto;
+		padding: 10px;
+		margin: 8px;
+		background-color: transparent;
+	}
+	button:hover {
+		background-color: var(--color-theme-1);
+		color: #FFF;
+	}
+	button:active {
+		transition: 0s;
+		border-color: var(--color-theme-1-c);
+		background-color: var(--color-theme-1-c);
+	}
+/** コピーキャンバスエリア */
+#copy-canvas-area {
+	position: relative;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	user-select: none;
+}
+/** 説明エリア */
+#desc-area {
+	position: relative;
+	width: 800px;
+	margin: 700px auto 50px;
+	font-size: 18px;
+	line-height: 150%;
+}
+	#desc-area hr {
+		margin: 50px 0;
+	}
+	#desc-area h3 {
+		margin: 30px 0 30px;
+		font-size: 140%;
+	}
+	#desc-area h4 {
+		margin: 25px 0 15px;
+		font-size: 120%;
+	}
+	#desc-area p {
+		margin: 20px 0;
+	}
+	#desc-area u {
+		/*text-decoration: underline dotted var(--color-text);*/
+		font-weight: bold;
+		text-decoration: none;
+    	background: linear-gradient(transparent 70%, #ffce87 70%);
+	}
+/** キャンバスコンテナ */
+#canvas-container {
+	position: relative;
+	width: 1000px;
+	height: 1000px;
+	overflow: hidden;
+	background: white;
+	user-select: none;
+}
+	#canvas-container > * {
+		position: absolute;
+		left: 0;
+		top: 0;
+		width: 100%;
+		height: 100%;
+	}
+/** ステージコンテナ */
+#stage-container {
+	z-index: 2;
+	pointer-events: none;
+}
+	#stage-container > * {
+		position: absolute;
+		left: 0;
+		top: 0;
+	}
+	.layer-object {
+		pointer-events: none;
+		z-index: 2;
+	}
+	.layer-object {
+		pointer-events: none;
+		z-index: 2;
+	}
+	#layer-gusher,
+	#layer-basket,
+	#layer-cannon {
+		z-index: 1;
+	}
+	#stage-image {
+		z-index: 0;
+	}
+	#canvas-steelhead {
+		z-index: 1;
+	}
+	#canvas-steeleel {
+		z-index: 3;
+	}
+		.stage-object {
+			/*
+			pointer-events: auto;
+			cursor: pointer;
+			*/
+			position: absolute;
+			transition: transform 300ms ease;
+			transform-origin: center center;
+			transform: translate(-50%, -50%);
+			margin: 1px 1px;
+		}
+		.stage-object.startpos {
+			transform: translate(-50%, -50%) rotate(calc(0deg - var(--stage-rotate)));
+			font-size: 20px;
+		}
+		.floorplan .stage-object.startpos {
+			color: #333;
+		}
+		.depthmap .stage-object.startpos {
+			color: white;
+		}
+		.screenshot .stage-object.startpos {
+			color: white;
+			text-shadow: rgb(0, 0, 0) 1px 0px 0px, rgb(0, 0, 0) 0.540302px 0.841471px 0px, rgb(0, 0, 0) -0.416147px 0.909297px 0px, rgb(0, 0, 0) -0.989992px 0.14112px 0px, rgb(0, 0, 0) -0.653644px -0.756802px 0px, rgb(0, 0, 0) 0.283662px -0.958924px 0px, rgb(0, 0, 0) 0.96017px -0.279415px 0px;
+		}
+		/** スポーン方向ごとの--color変数 */
+		.spawndir-1 {
+			--color: #4caf50;
+		}
+		.spawndir-2 {
+			--color: #cddc39;
+		}
+		.spawndir-3 {
+			--color: #ffc107;
+		}
+		.mothership {
+			--color: #6b07ff;
+		}
+		/** スポナー */
+		.stage-object.mothership,
+		.stage-object.spawner {
+			width: 20px;
+			height: 20px;
+			background: var(--color);
+			border: 5px solid white;
+			border-radius: 5px;
+			box-shadow: 4px 4px 6px rgba(0, 0, 0, .2);
+			transform: translate(-50%, -50%) rotate(calc(0deg - var(--stage-rotate)));
+		}
+		.stage-object.mothership,
+		.stage-object.spawner:hover {
+			transform: translate(-50%, -50%) rotate(calc(0deg - var(--stage-rotate))) scale(1.3);
+		}
+		/** バクダン */
+		.stage-object.steelhead  {
+			--color: #ff6300;
+		}
+		/** カタパッド&タワー */
+		.stage-object.steelhead.selected,
+		.stage-object.steelhead,
+		.stage-object.flyfish,
+		.stage-object.stinger {
+			width: 16px;
+			height: 16px;
+			background: var(--color);
+			border: 4px solid white;
+			border-radius: 50%;
+			box-shadow: 4px 4px 6px rgba(0, 0, 0, .2);
+			transform: translate(-50%, -50%) rotate(calc(0deg - var(--stage-rotate)));
+			cursor: pointer;
+		}
+		.stage-object.steelhead:hover,
+		.stage-object.flyfish:hover,
+		.stage-object.stinger:hover {
+			transform: translate(-50%, -50%) rotate(calc(0deg - var(--stage-rotate))) scale(1.3);
+		}
+		/** 大砲 */
+		.stage-object.cannon {
+			width: 30px;
+			height: 30px;
+			transform: translate(-50%, -50%) rotate(calc(0deg - var(--stage-rotate)));
+		}
+		/** コンテナ */
+		.stage-object.basket {
+			--rotate: 0rad;
+			width: 32px;
+			height: 32px;
+			transform: translate(-50%, -50%) rotate(var(--rotate));
+		}
+		/** 間欠泉 */
+		.stage-object.gusher {
+			width: 32px;
+			height: 32px;
+			--rotate: 0rad;
+			transform: translate(-50%, -50%) rotate(calc(0deg - var(--stage-rotate)));
+		}
+		/** コウモリ */
+		#layer-drizzler input {
+			display: none;
+		}
+		#layer-drizzler label {
+			position: absolute;
+			display: block;
+			cursor: pointer;
+			pointer-events: auto;
+			width: 16px;
+			height: 16px;
+			border-radius: 50%;
+			border: 4px solid white;
+			background: #2196f3;
+			box-shadow: 4px 4px 6px rgba(0, 0, 0, .2);
+			transform: translate(-50%, -50%) rotate(calc(0deg - var(--stage-rotate)));
+			z-index: 10;
+		}
+		#layer-drizzler label:hover {
+			transform: translate(-50%, -50%) rotate(calc(0deg - var(--stage-rotate))) scale(1.3);
+		}
+		#layer-drizzler div {
+			position: absolute;
+			left: 0;
+			top: 0;
+			display: block;
+			width: 600px;
+			height: 600px;
+			border-radius: 50%;
+			background: rgba(0, 46, 189, .5);
+			pointer-events: none;
+			transform-origin: center center;
+			transform: translate(-50%, -50%) scale(0);
+			transition: all 300ms ease;
+			z-index: 1;
+		}
+		#layer-drizzler input:checked + label + div {
+			transform: translate(-50%, -50%) scale(1);
+		}
+		/** ヘビ */
+		#layer-steeleel {
+			z-index: 11;
+		}
+		.stage-object.eel {
+			position: absolute;
+			left: 0;
+			top: 0;
+			margin: 0;
+			transition: none;
+			transform: none;
+			filter: drop-shadow(2px 2px 2px rgba(0, 0, 0, .2));
+			z-index: 2;
+		}
+		.stage-object-eel-node {
+			position: absolute;
+			left: 0px;
+			top: 0px;
+			--rotate: 0deg;
+			transform: translate(-50%, -50%) scale(0.08) rotate(var(--rotate));
+			z-index: 1;
+		}
+		.stage-object-eel-head {
+			pointer-events: auto;
+			cursor: move;
+			z-index: 2;
+			width: 35px;
+			height: 64px;
+			transform: translate(-50%, -50%) rotate(var(--rotate));
+		}
+		.layer-object .mydraggable {
+			z-index: 2;
+		}
+	/** ブキコンテナ */
+	.image-container {
+		position: absolute;
+		transform: translate(-50%, -50%);
+	}
+		.image-container > img {
+			position: absolute;
+			left: 0;
+			top: 0;
+			width: 100%;
+			height: 100%;
+		}
+	.weapon-container {
+		position: absolute;
+		--range: 0px;
+		--blast: 0px;		
+		--color: #ff2ea5;
+		transform: translate(-50%, -50%);
+	}
+		.weapon-container img {
+			position: absolute;
+			left: 0;
+			top: 0;
+			width: 100%;
+			height: 100%;
+			z-index: 2;
+		}
+		.weapon-container .range-container {
+			position: absolute;
+			left: 0;
+			top: 0;
+			width: 100%;
+			height: 100%;
+			z-index: 1;
+			transform: rotate(270deg);
+			pointer-events: none;
+		}
+			.weapon-container .range-container .v-range-line,
+			.weapon-container .range-container .range-line {
+				position: absolute;
+				top: 50%;
+				left: 50%;
+				background: var(--color);
+				border: 1px solid var(--color);
+				width: calc(var(--range) * var(--stage-scale));
+				width: var(--range);
+				height: 0px;
+				transform-origin: center center;
+				transform: translateY(-50%);
+			}
+			.weapon-container .range-container .h-range-line,
+			.weapon-container .range-container .h-range-end,
+			.weapon-container .range-container .h-range-far {
+				margin-top: -10px;
+			}
+			.weapon-container .range-container .v-range-line,
+			.weapon-container .range-container .v-range-end,
+			.weapon-container .range-container .v-range-far {
+				margin-top: 12px;
+			}
+			.weapon-container .range-container .v-range-line {
+				width: calc(var(--v-range) * var(--stage-scale));
+				width: var(--v-range);
+			}
+			.weapon-container .range-container .range-handle,
+			.weapon-container .range-container .range-end,
+			.weapon-container .range-container .range-far,
+			.weapon-container .range-container .v-range-end,
+			.weapon-container .range-container .v-range-far,
+			.weapon-container .range-container .range-near-end,
+			.weapon-container .range-container .range-blast {
+				position: absolute;
+				top: 50%;
+				left: calc(50% + var(--range) * var(--stage-scale));
+				left: calc(50% + var(--range));
+				border-radius: 50%;
+				background: var(--color);
+				transform-origin: center center;
+				transform: translate(-50%, -50%);
+				z-index: 4;
+			}
+			.weapon-container .range-container .range-near-end {
+				left: calc(50% + var(--range-near) * var(--stage-scale));
+				left: calc(50% + var(--range-near));
+				width: 10px;
+				height: 10px;
+				opacity: 1;
+			}
+			.weapon-container .range-container .range-end {
+				width: 15px;
+				height: 15px;
+				opacity: 1;
+			}
+			.weapon-container .range-container .range-far {
+				width: calc(var(--range-far) * var(--stage-scale));
+				width: calc(var(--range-far));
+				height: 15px;
+				border-radius: 3px;
+				transform: translateY(-50%);
+				opacity: 0.4;
+			}
+			.weapon-container .range-container .h-range-far,
+			.weapon-container .range-container .h-range-end {
+				height: 30px;
+				border-radius: 5px;
+			}
+			.weapon-container .range-container .v-range-end {
+				left: calc(50% + var(--v-range) * var(--stage-scale));
+				left: calc(50% + var(--v-range));
+				width: 15px;
+				height: 15px;
+				opacity: 1;
+			}
+			.weapon-container .range-container .v-range-far {
+				left: calc(50% + var(--v-range) * var(--stage-scale));
+				left: calc(50% + var(--v-range));
+				width: calc(var(--v-range-far) * var(--stage-scale));
+				width: var(--v-range-far));
+				height: 15px;
+				border-radius: 3px;
+				transform: translateY(-50%);
+				opacity: 0.4;
+			}
+			.weapon-container .range-container .range-blast {
+				width: calc(var(--blast) * var(--stage-scale));
+				width: var(--blast);
+				height: calc(var(--blast) * var(--stage-scale));
+				height: var(--blast);
+				opacity: 0.4;
+			}
+	/** テキストエリアコンテナ */
+	.textarea-container {
+		position: absolute;
+		display: inline-block;
+		transform: translate(-50%, -50%);
+	}
+		.textarea-container > textarea {
+			background: transparent;
+			pointer-events: auto;
+			overflow: hidden;
+			padding: 10px;
+			resize: none;
+			outline: none;
+			border: 1px solid transparent;
+			border-radius: 0;
+			font-size: 30px;
+			white-space: nowrap;
+			word-break: break-all;
+			line-height: 100%;
+			--stroke-color: white;
+		}
+		.textarea-container > textarea:focus {
+			border: 1px solid #333;
+			background: white;
+			text-shadow: none !important;
+		}
+		.textarea-container > textarea + div {
+			pointer-events: auto;
+			cursor: move;
+			position: absolute;
+			left: 0;
+			top: 0;
+			padding: 10px;
+			border: 1px solid transparent;
+		}
+		.mydraggable-disable .myresizable-handle {
+			display: none;
+		}
+		.mydraggable-disable .myrotatable-handle {
+			display: none;
+		}
+	/** ドローイング */
+	.drawing-container {
+		pointer-events: auto;
+		cursor: move;
+		position: absolute;
+		left: 0;
+		top: 0;
+		transform-origin: center center;
+		transform: translate(-50%, -50%);
+	}
+		.drawing-container canvas {
+			pointer-events: none;
+		}
+/** イベントレイヤー */
+.layer-event {
+	z-index: 10;
+	display: none;
+}
+.layer-event.showed {
+	display: block;
+}
+/** 一時描画キャンバス */
+#canvas-tempdrawing {
+	pointer-events: none;
+	z-index: 2;
+}
+/** ドラッガブル */
+.mydraggable {
+	pointer-events: auto;
+	cursor: move;
+}
+.stage-object-eel-node.mydraggable {
+	/*border: 1px dashed gray;*/
+}
+.mydraggable.draggable-panel {
+	border: none;
+}
+
+/** リサイザブルハンドル */
+.myresizable-handle {
+	position: absolute;
+	top: 100%;
+	left: 100%;
+	margin-top: 0;
+	margin-left: 0;
+	min-width: 30px;
+	min-height: 30px;
+	padding: 0;
+	cursor: nwse-resize;
+	background: transparent;
+	background: rgba(255, 0, 0, .3);
+	pointer-events: auto;
+	z-index: 3;
+	background: no-repeat center/80% url(../img/css/resize.png) rgba(255, 0, 0, .1);
+	border: 1px dashed gray;
+}
+/** ローテータブルハンドル */
+.myrotatable-handle {
+	position: absolute;
+	bottom: 100%;
+	left: 100%;
+	margin-top: -25%;
+	margin-left: 0;
+	min-width: 30px;
+	min-height: 30px;
+	padding: 0;
+	cursor: grab;
+	background: transparent;
+	background: rgba(0, 0, 255, .3);
+	pointer-events: auto;
+	z-index: 2;
+	background: no-repeat center/80% url(../img/css/rotate.png) rgba(0, 0, 255, .1);
+	border: 1px dashed gray;
+}
+/** 個別ハンドル */
+.selected.mydraggable {
+	border: 1px dashed gray;
+}
+.mydraggable {
+	border: none;
+}
+.selected .myresizable-handle,
+.selected .myrotatable-handle {
+	display: block;
+}
+.myresizable-handle,
+.myrotatable-handle {
+	display: none;
+}
+#stage-container .myrotatable-handle,
+#stage-container .myresizable-handle {
+	width: calc(30px / var(--stage-scale));
+	height: calc(30px / var(--stage-scale));
+}
+.weapon-container .range-container .range-handle {
+	border-radius: 0;
+	width: 40px;
+	height: 40px;
+	margin: 0;
+	z-index: 3;
+	background: no-repeat center/80% url(../img/css/rotate.png) rgba(0, 0, 255, .1);
+}
+/** パネル */
+.draggable-panel {
+	position: absolute;
+	left: 0;
+	top: 0;
+	display: inline-block;
+	background: var(--color-background);
+	box-shadow: 5px 5px 15px var(--color-shadow);
+	padding: 20px;
+	font-size: 20px;
+	border-radius: 10px;
+	cursor: move;
+	user-select: none;
+	white-space: nowrap;
+	z-index: 999;
+}
+	.draggable-panel h3 {
+		line-height: 100%;
+		font-size: 18px;
+		text-align: center;
+		margin: 18px 0 18px;
+		font-weight: bold;
+		pointer-events: none;
+	}
+	.draggable-panel h3:first-child,
+	.selector-container:first-child h3 {
+		margin-top: 0px;
+	}
+	.object-adder-name {
+		padding: 5px 5px;
+	}
+	.selector-container label {
+		display: block;
+		cursor: pointer;
+		border-top: 1px solid transparent;
+		border-bottom: 1px solid #d0d0d0;
+		font-size: 16px;
+		padding: 6px 6px;
+	}
+	.selector-container label:last-child {
+		border-bottom: none;
+	}
+	.selector-container label:hover {
+		background: var(--color-theme-1-b);
+	}
+		/** チェックボックス */
+		.selector-container input[type=checkbox] {
+			display: none;
+		}
+		.selector-container input[type=checkbox] + div {
+			box-sizing: border-box;
+			cursor: pointer;
+			display: inline-block;
+			padding: 5px 30px;
+			position: relative;
+			width: auto;
+		}
+		.selector-container input[type=checkbox] + div::before {
+			border: 1px solid var(--color-theme-1);
+			width: 10px;
+			height: 10px;
+			border-radius: 4px;
+			content: '';
+			display: block;
+			position: absolute;
+			top: 50%;
+			left: 5px;
+			margin-top: -8px;
+		}
+		.selector-container input[type=checkbox]:checked + div::before {
+			background: var(--color-theme-1);
+		}
+		/** ラジオボタン */
+		.selector-container input[type=radio] {
+			display: none;
+		}
+		.selector-container input[type=radio] + div {
+			box-sizing: border-box;
+			cursor: pointer;
+			display: inline-block;
+			padding: 5px 30px;
+			position: relative;
+			width: auto;
+		}
+		.selector-container input[type=radio] + div::before,
+		.selector-container input[type=radio] + div::after {
+			border: 1px solid var(--color-theme-1);;
+			border-radius: 50%;
+			content: '';
+			display: block;
+			width: 12px;
+			height: 12px;
+			position: absolute;
+			top: 50%;
+			left: 5px;
+			margin-top: -8px;
+		}
+		.selector-container input[type=radio] + div::after {
+			background: var(--color-theme-1);
+			opacity: 0;
+			transform-origin: center center;
+			transform: scale(.6);
+		}
+		.selector-container input[type=radio]:checked + div::after {
+			opacity: 1;
+		}
+		#object-adder .color-setting,
+		#tool-selector .color-setting {
+			margin: 5px 0;
+		}
+		#object-adder .color-name,
+		#tool-selector .color-name {
+			width: 100px;
+			vertical-align: super;
+			font-size: 15px;
+			display: inline-block;
+		}
+	.draggable-panel .button-area {
+		text-align: center;
+	}
+/** カラーピッカー */
+.palette-color-picker-bubble {
+	white-space: normal;
+	text-align: center;
+}
+.palette-color-picker-bubble.double .swatch {
+	width: 35px;
+	height: 35px;
+	padding: 0;
+}
+.palette-color-picker-bubble .swatch:last-child,
+.palette-color-picker-button.transparent {
+	background: no-repeat left top/100% 100% url(../img/css/transparent-check.png) !important;
+	image-rendering: pixelated;
+}
+.palette-color-picker-bubble .swatch.clear:before {
+	display: none;
+}
+/** ステージ変形パネル */
+#stage-transformer {
+	text-align: center;
+}
+	#stage-transformer h4 {
+		font-size: 16px;
+		font-weight: normal;
+		text-align: center;
+		width: 80px;
+		display: inline-block;
+	}
+	#stage-transformer > div {
+		margin-top: 10px;
+		cursor: default;
+	}
+	#stage-selector button {
+		width: 180px;
+		padding: 6px;
+		font-size: 14px;
+		margin: 16px 6px;
+	}
+	#stage-transformer button {
+		width: 140px;
+		padding: 6px;
+		font-size: 14px;
+		margin: 16px 6px;
+	}
+	#stage-transformer input[type=text] {
+		width: 80px;
+		height: 25px;
+		font-size: 16px;
+		text-align: center;
+		background: transparent;
+		box-shadow: none;
+		border-radius: 6px;
+		border: 1px solid transparent;
+		background: var(--color-background);
+		color: var(--color-text);
+	}
+	#stage-transformer input[type=text]:active,
+	#stage-transformer input[type=text]:focus {
+		outline: none;
+		background: white;
+		color: #333;
+		box-shadow: 2px 2px 6px rgba(0, 0, 0, .1) inset;
+		border: 1px solid #ddd;
+	}
+	input[type=range] {
+		-webkit-appearance: none;
+		appearance: none;
+		background-color: var(--color-theme-1-a);
+		height: 2px;
+		width: 200px;
+		border-radius: 6px;
+		margin: 14px 0;
+		transform: translateY(-5px);
+	}
+	input[type=range]:focus,
+	input[type=range]:active {
+		outline: none;
+	}
+	input[type=range]::-webkit-slider-thumb {
+		-webkit-appearance: none;
+		appearance: none;
+		cursor: pointer;
+		position: relative;
+		width: 20px;
+		height: 20px;
+		display: block;
+		border: 2px solid var(--color-theme-1);
+		background-color: #fff;
+		border-radius: 50%;
+		-webkit-border-radius: 50%;
+	}
+/** 図形パネル */
+#tool-selector input[type=text] {
+	width: 80px;
+	height: 25px;
+	font-size: 16px;
+	text-align: center;
+	background: transparent;
+	box-shadow: none;
+	border-radius: 6px;
+	border: 1px solid transparent;
+	background: var(--color-background);
+	color: var(--color-text);
+	vertical-align: super;
+}
+#tool-selector input[type=text]:active,
+#tool-selector input[type=text]:focus {
+	outline: none;
+	background: white;
+	color: #333;
+	box-shadow: 2px 2px 6px rgba(0, 0, 0, .1) inset;
+	border: 1px solid #ddd;
+}
+
+/** ブキ追加パネル */
+#image-adder {
+	width: 285px;
+	white-space: normal;
+}
+	#image-adder img {
+		width: 48px;
+		margin: 2px 4px;
+		line-height: 100%;
+		cursor: pointer;
+	}
+#weapon-adder {
+	width: 285px;
+	white-space: normal;
+}
+	#weapon-adder h5 {
+		margin: 10px 0 5px;
+	}
+	#weapon-adder div {
+		line-height: 0;
+	}
+		#weapon-adder img {
+			width: 48px;
+			margin: 2px 4px;
+			line-height: 100%;
+			cursor: pointer;
+		}
+		#weapon-adder-others img:nth-child(6),
+		#weapon-adder-others img:nth-child(7),
+		#weapon-adder-others img:nth-child(8),
+		#weapon-adder-others img:nth-child(9) {
+			filter: drop-shadow(0 0 1px black);
+		}
+/** カバー */
+.cover-outer {
+	display: none;
+	width: 100%;
+	height: 100%;
+	position: fixed;
+	left: 0;
+	top: 0;
+	background: rgba(255, 255, 255, .9);
+	z-index: 9999;
+}
+	.cover-inner {
+		width: max-content;
+		height: max-content;
+		max-height: 90%;
+		position: absolute;
+		left: 0;
+		right: 0;
+		top: 0;
+		bottom: 0;
+		margin: auto;
+		overflow: auto;
+	}
+		#confirm input {
+			width: 400px;
+			height: 20px;
+			display: block;
+			padding: 10px;
+			font-size: 15px;
+		}
+		#confirm .button-area {
+			display: flex;
+			justify-content: flex-end;
+			margin-top: 10px;
+		}
+			#confirm button {
+				width: 100px;
+				height: 40px;
+				line-height: 0;
+			}
+			#confirm button:last-child {
+				margin-right: 0;
+			}
+		#load {
+			text-align: center;
+		}
+		#load .data-item {
+			margin: 20px 40px;
+			padding: 10px 20px;
+			border-radius: 5px;
+			border: 1px solid gray;
+			cursor: pointer;
+			display: flex;
+			justify-content: flex-start;
+			width: 400px;
+		}
+		#load .data-item:hover {
+			background: rgba(255, 255, 0, .1);
+			display: flex;
+		}
+			#load .data-item .data-right,
+			#load .data-item .data-left {
+				display: flex;
+				align-items: center;
+			}
+			#load .data-item .data-center {
+				width: 260px;
+				text-align: left;
+			}
+				#load .data-item img {
+					width: 60px;
+					height: 60px;
+					margin-right: 20px;
+				}
+			#load .data-item .data-title {
+				font-size: 20px;
+				word-break: break-all;
+				/*
+				text-overflow: ellipsis;
+				white-space: nowrap;
+				*/
+				max-width: 260px;
+				max-height: 46px;
+				overflow: hidden;
+			}
+			#load .data-item .data-date {
+				display: inline-block;
+				font-size: 12px;
+			}
+			#load .data-item .data-delete {
+				display: inline-block;
+				font-size: 12px;
+				cursor: pointer;
+				color: blue;
+				width: 40px;
+				margin: 0 10px;
+				padding: 20px 0;
+			}
+			#load .data-item .data-delete:hover {
+				text-decoration: underline;
+			}
+			#load button {
+				font-size: 18px;
+				padding: 8px 26px;
+				width: auto;
+			}
+/** toaster */
+.toast-close-button {
+	position: absolute;
+	width: 20px;
+	height: 20px;
+	right: 0px;
+	top: 0px;
+}
+/** アップデート履歴 */
+#update-history {
+	border-spacing: 0;
+}
+	#update-history td {
+		border: none;
+		border-bottom: 1px solid #aaa;
+	}
+	#update-history tr:last-child td {
+		border-bottom: none;
+	}
+/** スマホ向け */
+@media screen and (max-width:600px) {
+	body {
+		margin: 0;
+	}
+	#canvas-area {
+		display: block;
+	}
+	#canvas-container {
+		overflow: auto;
+		--canavs-scale: 0.5;
+		transform: scale(0.5);
+		transform-origin: left top;
+	}
+}
