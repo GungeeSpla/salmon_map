@@ -3,7 +3,6 @@
 // =========================================================
 
 (function($){
-	let lastTouchEvent;
 	/** myTrigger(name)
 	 */
 	$.fn.myTrigger = function(name) {

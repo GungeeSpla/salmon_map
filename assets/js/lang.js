@@ -91,6 +91,8 @@ layer-image|画像|Image
 layer-weapon|ブキ|Weapon
 layer-steeleel|ヘビ|Steel Eel
 layer-steelhead|バクダン|Steelhead
+layer-drizzler-link|コウモリの接続|Drizzler Link
+layer-voronoi|ボロノイ図|Voronoi
 layer-drizzler|コウモリ|Drizzler
 layer-flyfish|カタパッド|Flyfish
 layer-stinger|タワー|Stinger

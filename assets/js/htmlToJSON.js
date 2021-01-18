@@ -31,13 +31,16 @@ function readJSON(json) {
 	}
 
 	/** コウモリ */
-	if (json.dz) {
-		ncs.onloadxml = () => {
+	ncs.onloadxml = () => {
+		if (json.dz) {
 			json.dz.forEach((def) => {
 				$('#'+def[0]).prop('checked', !!def[1]);
 			});
-		};
-	}
+		}
+		if (json.vt) {
+			drawVoronoi(json.vt);
+		}
+	};
 
 	loadStage(ncs);
 
@@ -217,6 +220,11 @@ function htmlToJSON() {
 		dz.push([id, checked]);
 	});
 	if (dz.length) json.dz = dz;
+
+	const voronoiTarget = $voronoiCanvas.attr('voronoi-target');
+	if (voronoiTarget) {
+		json.vt = voronoiTarget;
+	}
 
 	/** ヘビ */
 	const se = [];

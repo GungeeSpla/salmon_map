@@ -2,11 +2,13 @@
 // constants.js
 // =========================================================
 
-const VERSION = '0.1.3';
+const VERSION = '0.2.0';
 const STORAGE_KEY = 'salmon_map';
 const STORAGE_KEY_AUTOSAVE = 'salmon_map_autosave';
 const STORAGE_KEY_JSONSAVE = 'salmon_map_jsonsave';
 const AUTOSAVE_INTERVAL = 5000;
+const CHARCODE_a = ('a').charCodeAt(0);
+const CHARCODE_A = ('A').charCodeAt(0);
 const DEFAULT_SAVEDATAOBJ = {
 	stage: 'shakeup',
 	tide: 'normal',
@@ -14,6 +16,8 @@ const DEFAULT_SAVEDATAOBJ = {
 	'checkbox-layer-basket': true,
 	'checkbox-layer-cannon': true,
 	'checkbox-layer-gusher': true,
+	'checkbox-layer-drizzler-link': false,
+	'checkbox-layer-voronoi': false,
 	'checkbox-layer-drizzler': false,
 	'checkbox-layer-flyfish': false,
 	'checkbox-layer-spawner': false,
@@ -40,16 +44,16 @@ const DEFAULT_MAP_TRANSFORM = {
 	'shakeride-low': [40, 280, 0.75, 180, 68]
 };
 const USER_LANG = (getQueries().lang || navigator.language || navigator.USER_LANGuage || 'ja').includes('ja') ? 'ja' : 'en';
-const CANVAS_VIEW_WIDTH = 800;
-const CANVAS_VIEW_HEIGHT = 800;
-const CANVAS_WIDTH = 2400;
-const CANVAS_HEIGHT = 2400;
+const STAGE_WIDTH = 2400;
+const STAGE_HEIGHT = 2400;
 const LAYER_MANAGER_LIST = [
 	{ name: 'layer-basket', target: 'Obj_CoopIkuraBankBase' },
 	{ name: 'layer-gusher', target: 'Obj_CoopSpawnGeyser' },
 	{ name: 'layer-cannon', target: 'Obj_MissilePositionVs'	},
 	{ name: 'layer-startpos', target: 'StartPos' },
 	{ name: 'layer-spawner', target: 'Obj_CoopSpawnPointZako' },
+	{ name: 'layer-drizzler-link' },
+	{ name: 'layer-voronoi' },
 	{ name: 'layer-drizzler', target: 'Obj_CoopJumpPointEnemyRocket' },
 	{ name: 'layer-flyfish', target: 'Obj_CoopArrivalPointEnemyCup' },
 	{ name: 'layer-stinger', target: 'Obj_CoopArrivalPointEnemyTower' },

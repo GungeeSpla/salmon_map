@@ -6,8 +6,10 @@
  */
 let ymapReady = false;
 let ymapReadyFuncs = [];
+let stageObjects;
 let stageObjectsReady = false;
 let stageObjectsReadyFuncs = [];
+let drizzlerObjects;
 let html2canvasWorking = false;
 let $canvasContainer;
 let $stageContainer;
@@ -19,8 +21,14 @@ let $steeleelCanvas;
 let steeleelCtx;
 let $steelheadCanvas;
 let steelheadCtx;
+let $drizzlerLinkCanvas;
+let drizzlerLinkCtx;
+let $voronoiCanvas;
+let voronoiCtx;
 let ymapImagedata;
 let currentFilename = '';
+let voronoi;
+let lastTouchEvent;
 let canvasSetting = {
 	stage: 'shakeup',
 	tide: 'normal',
@@ -67,7 +75,7 @@ function init() {
 
 	/** 開発用要素の削除 */
 	$('.hidden-in-production').remove();
-
+	
 	/** Webフォントの読み込み */
 	// @see http://ithat.me/2016/12/10/js-web-font-load-start-complete-detection-web-font-loader
 	WebFont.load({
@@ -84,14 +92,14 @@ function init() {
 	
 	/** キャンバス */
 	$canvasContainer = $('#canvas-container').css({
-		width: `${CANVAS_VIEW_WIDTH}px`,
-		height: `${CANVAS_VIEW_HEIGHT}px`
+		width: `${canvasSetting.canvasWidth}px`,
+		height: `${canvasSetting.canvasHeight}px`
 	});
 	$stageContainer = $('#stage-container').css({
-		left: `${CANVAS_VIEW_WIDTH / 2}px`,
-		top: `${CANVAS_VIEW_HEIGHT / 2}px`,
-		width: `${CANVAS_WIDTH}px`,
-		height: `${CANVAS_HEIGHT}px`,
+		left: `${canvasSetting.canvasWidth / 2}px`,
+		top: `${canvasSetting.canvasHeight / 2}px`,
+		width: `${STAGE_WIDTH}px`,
+		height: `${STAGE_HEIGHT}px`,
 		transformOrigin: 'center'
 	});
 	/*
@@ -145,16 +153,16 @@ function init() {
 	const saveDataJSON = localStorage.getItem(STORAGE_KEY);
 	const saveDataObj = saveDataJSON ? JSON.parse(saveDataJSON) : DEFAULT_SAVEDATAOBJ;
 	const $manager = $('#object-layer-manager .selector-container');
-	let mothershipIndex = Infinity;
+	let railIndex = Infinity;
 	LAYER_MANAGER_LIST.forEach((item, i) => {
-		if (item.name === 'layer-mothership') {
-			mothershipIndex = i;
+		if (item.name === 'layer-rail') {
+			railIndex = i;
 		}
 		const $layer = $('<div class="layer-object" id="' + item.name + '"></div>').css({
-			width: `${CANVAS_WIDTH}px`,
-			height: `${CANVAS_HEIGHT}px`
+			width: `${STAGE_WIDTH}px`,
+			height: `${STAGE_HEIGHT}px`
 		}).appendTo($stageContainer);
-		if (i > mothershipIndex) {
+		if (i > railIndex) {
 			return;
 		}
 		const $div1 = $('<label draggable="false" id="label-checkbox-' + item.name + '" for="checkbox-' + item.name + '"></label>');
@@ -211,17 +219,32 @@ function init() {
 	*/
 	/** バクダンサークル描画キャンバス */
 	{
-		const [canvas, ctx] = createCanvas(CANVAS_WIDTH, CANVAS_HEIGHT);
+		const [canvas, ctx] = createCanvas(STAGE_WIDTH, STAGE_HEIGHT);
 		const $canvas = $(canvas).attr('id', 'canvas-steelhead').appendTo('#layer-steelhead');
 		$steelheadCanvas = $canvas;
 		steelheadCtx = ctx;
 	}
 	/** ヘビ描画キャンバス */
 	{
-		const [canvas, ctx] = createCanvas(CANVAS_WIDTH, CANVAS_HEIGHT);
+		const [canvas, ctx] = createCanvas(STAGE_WIDTH, STAGE_HEIGHT);
 		const $canvas = $(canvas).attr('id', 'canvas-steeleel').appendTo('#layer-steeleel');
 		$steeleelCanvas = $canvas;
 		steeleelCtx = ctx;
+	}
+	/** コウモリの駐車場接続キャンバス */
+	{
+		const [canvas, ctx] = createCanvas(STAGE_WIDTH, STAGE_HEIGHT);
+		const $canvas = $(canvas).attr('id', 'canvas-drizzler-link').appendTo('#layer-drizzler-link');
+		$drizzlerLinkCanvas = $canvas;
+		drizzlerLinkCtx = ctx;
+	}
+	/** ボロノイ図 */
+	{
+		voronoi = new Voronoi();
+		const [canvas, ctx] = createCanvas(STAGE_WIDTH, STAGE_HEIGHT);
+		const $canvas = $(canvas).attr('id', 'canvas-voronoi').appendTo('#layer-voronoi');
+		$voronoiCanvas = $canvas;
+		voronoiCtx = ctx;
 	}
 	/** ラベルをクリックしたときのイベント伝播停止 */
 	$('label,input[type=range]').each((i, elm) => {
@@ -269,8 +292,8 @@ function init() {
 
 	/** ステージ変形 */
 	$stageContainer.css({
-		left: `${CANVAS_VIEW_WIDTH / 2}px`,
-		top: `${CANVAS_VIEW_HEIGHT / 2}px`,
+		left: `${canvasSetting.canvasWidth / 2}px`,
+		top: `${canvasSetting.canvasHeiht / 2}px`,
 		transformOrigin: 'center',
 		transform: `translate(-50%, -50%)`
 	});
@@ -410,7 +433,7 @@ function init() {
 
 	/** y座標キャンバス(不可視)の確保 */
 	{
-		const [canvas, ctx] = createCanvas(CANVAS_WIDTH, CANVAS_HEIGHT);
+		const [canvas, ctx] = createCanvas(STAGE_WIDTH, STAGE_HEIGHT);
 		const $canvas = $(canvas);
 		$ymapCanvas = $canvas;
 		ymapCtx = ctx;
@@ -567,7 +590,7 @@ function init() {
 	$stageContainer.myOn('mousedown', (e) => {
 		if (ymapReady) {
 			const offset = pageXYToStageXY(e.pageX, e.pageY);
-			if (0 <= offset.x && offset.x <= CANVAS_WIDTH && 0 <= offset.y && offset.y <= CANVAS_HEIGHT) {
+			if (0 <= offset.x && offset.x <= STAGE_WIDTH && 0 <= offset.y && offset.y <= STAGE_HEIGHT) {
 				const depthValue = getDepthValueByImagedata(ymapImagedata, offset.x, offset.y);
 				console.log(`(x, y, z) = (${offset.x - 1200}, ${depthValue}, ${offset.y - 1200})`);
 				//console.log(depthValueToRGB(depthValue + 40));
@@ -630,6 +653,27 @@ function readXML(xml) {
 		const arr = elm.querySelectorAll(query);
 		return arr[arr.length - 1].getAttribute('StringValue');
 	}
+	function sv3(elm) {
+		const link = elm.querySelector('[Name=Links]');
+		if (link) {
+			const linkbuf = link.querySelector('[Name=LinkBuf]');
+			if (linkbuf) {
+				const c1s = link.querySelectorAll('C1');
+				if (c1s.length) {
+					const ids = [];
+					Array.prototype.forEach.call(c1s, (c1) => {
+						const a = c1.querySelector('[Name=DestUnitId]');
+						if (a) {
+							const id = a.getAttribute('StringValue');
+							ids.push(id);
+						}
+					});
+					return ids;
+				}
+			}
+		}
+		return null;
+	}
 	const doc = xml.documentElement;
 	const elms = doc.querySelectorAll('Root>C1>C0>C1');
 	const objs = [];
@@ -651,6 +695,7 @@ function readXML(xml) {
 		const rx = parseFloat(sv1(item, '[Name=Rotate]>[Name=X]'));
 		const ry = parseFloat(sv1(item, '[Name=Rotate]>[Name=Y]'));
 		const rz = parseFloat(sv1(item, '[Name=Rotate]>[Name=Z]'));
+		const links = sv3(item);
 		if (!layerNames.includes(layer)) {
 			layerNames.push(layer);
 		}
@@ -663,7 +708,7 @@ function readXML(xml) {
 		const num = groupCounts[group];
 		const data = {
 			id, num, index, layer, group, tx, ty, tz,
-			sx, sy, sz, rx, ry, rz
+			sx, sy, sz, rx, ry, rz, links
 		};
 		if (group === 'Rail_Pink') {
 			const arr = [];
@@ -687,7 +732,11 @@ function readXML(xml) {
 		objs.push(data);
 	});
 	stageObjects = objs;
+	drizzlerObjects = filterStageObjects('Obj_CoopJumpPointEnemyRocket');
 	LAYER_MANAGER_LIST.forEach((layerItem) => {
+		if (!layerItem.target) {
+			return;
+		}
 		const $layer = $('#' + layerItem.name);
 		objs.forEach((obj) => {
 			if (obj.group.includes(layerItem.target)) {
@@ -699,12 +748,143 @@ function readXML(xml) {
 			}
 		});
 	});
+	updateDrizzlerLinkCanvas();
 	stageObjectsReady = true;
 	if (stageObjectsReadyFuncs.length) {
 		stageObjectsReadyFuncs.forEach((fn) => {
 			fn();
 		});
 		stageObjectsReadyFuncs = [];
+	}
+}
+
+/** updateDrizzlerLinkCanvas()
+ */
+function updateDrizzlerLinkCanvas() {
+	drizzlerObjects.forEach((d1) => {
+		const ctx = drizzlerLinkCtx;
+		if (!isTideEqual(canvasSetting.tide, d1)) {
+			return;
+		}
+		if (d1.links) {
+			d1.links.forEach((id) => {
+				const d2 = getDrizzlerObject(id);
+				ctx.lineCap = 'round';
+				ctx.beginPath();
+				ctx.moveTo(d1.tx + 1200, d1.tz + 1200);
+				ctx.lineTo(d2.tx + 1200, d2.tz + 1200);
+				ctx.strokeStyle = 'white';
+				ctx.lineWidth = 9;
+				ctx.stroke();
+			});
+		}
+	});
+	drizzlerObjects.forEach((d1) => {
+		const ctx = drizzlerLinkCtx;
+		if (!isTideEqual(canvasSetting.tide, d1)) {
+			return;
+		}
+		if (d1.links) {
+			d1.links.forEach((id) => {
+				const d2 = getDrizzlerObject(id);
+				ctx.lineCap = 'round';
+				ctx.beginPath();
+				ctx.moveTo(d1.tx + 1200, d1.tz + 1200);
+				ctx.lineTo(d2.tx + 1200, d2.tz + 1200);
+				ctx.strokeStyle = '#2196f3';
+				ctx.lineWidth = 3;
+				ctx.stroke();
+			});
+		}
+	});
+	$('#layer-drizzler .stage-object.drizzler').each((i, elm) => {
+		$(elm).get(0).onclick = (e) => { e.preventDefault() };
+		$(elm).onShortTouch((e) => {
+			const id = $(elm).attr('for');
+			const $input = $('#'+id);
+			const val = $input.prop('checked');
+			$input.prop('checked', !val);
+		});
+		$(elm).onLongTouch((e) => {
+			const $input = $('#checkbox-layer-voronoi');
+			$input.prop('checked', true).myTrigger('change');
+			const id = $(elm).attr('for');
+			drawVoronoi(id);
+		});
+	})
+}
+
+function drawVoronoi(id) {
+	const ctx = voronoiCtx;
+	$voronoiCanvas.attr('voronoi-target', id);
+	const d1 = getDrizzlerObject(id);
+	const ids = [];
+	drizzlerObjects.forEach((d2) => {
+		if (isTideEqual(canvasSetting.tide, d2) && d2.links && d2.links.includes(id) && !ids.includes(d2.id)) {
+			ids.push(d2.id);
+		}
+	});
+	if (d1.links) {
+		d1.links.forEach((id2) => {
+			if (!ids.includes(id2)) {
+				ids.push(id2);
+			}
+		});
+	}
+	const poses = [];
+	ids.forEach((id) => {
+		const d2 = getDrizzlerObject(id);
+		poses.push({ x: d2.tx + 1200, y: d2.tz + 1200 });
+	});
+	if (poses.length) {
+		const diagram = voronoi.compute(poses, {
+			xl: 0,
+			xr: STAGE_WIDTH,
+			yt: 0,
+			yb: STAGE_HEIGHT
+		});
+		// see http://hackist.jp/?p=306
+		var new_cells = [];
+		var cell_id, halfedge_id;
+		var cellslen = diagram.cells.length;
+		for(cell_id = 0; cell_id < cellslen; cell_id++)
+		{
+			var new_cell = [];
+			var cell = diagram.cells[cell_id];
+			var halfedgelen = cell.halfedges.length;
+			for(halfedge_id = 0; halfedge_id < halfedgelen; halfedge_id++)
+			{
+				var p1 = cell.halfedges[halfedge_id].edge.va;
+				var p2 = cell.halfedges[halfedge_id].edge.vb;
+				var np1 = (halfedge_id == 0) ? cell.halfedges[halfedge_id+1].edge.va : cell.halfedges[halfedge_id-1].edge.va;
+				var np2 = (halfedge_id == 0) ? cell.halfedges[halfedge_id+1].edge.vb : cell.halfedges[halfedge_id-1].edge.vb;
+				var tmp_p = (halfedge_id == 0) ? (p1 == np1 || p1 == np2) ? p2 : p1
+											   : (p1 == np1 || p1 == np2) ? p1 : p2;
+				var new_p = {};
+				new_p.x = tmp_p.x;
+				new_p.y = tmp_p.y;
+				new_cell.push(new_p);
+			}
+			new_cells.push(new_cell);
+		}
+		new_cells.forEach((cell, i) => {
+			ctx.fillStyle = [
+				'#E1FA49',
+				'#DB934F',
+				'#F263EB',
+				'#4F84DB',
+				'#5CFF7B',
+				'#E1FA49',
+				'#DB934F',
+				'#F263EB'
+			][i];	
+			ctx.beginPath();
+			cell.forEach((vertex, i) => {
+				ctx[(i === 0) ? 'moveTo' : 'lineTo'](vertex.x, vertex.y);
+			});
+			ctx.closePath();
+			ctx.fill();
+		});
 	}
 }
 
@@ -718,6 +898,18 @@ function filterStageObjects(group, layer) {
 		ret.push(obj);
 	});
 	return ret;
+}
+
+/** getDrizzlerObject(id)
+ */
+function getDrizzlerObject(id) {
+	const ret = [];
+	for (let i = 0; i < drizzlerObjects.length; i++) {
+		if (drizzlerObjects[i].id === id) {
+			return drizzlerObjects[i];
+		}
+	}
+	return null;
 }
 
 /** selectStage()
@@ -771,8 +963,8 @@ function autosave() {
 function clearCanvas() {
 	$('#layer-item').empty();
 	$('#layer-steeleel .stage-object,#layer-steelhead .stage-object').remove();
-	steelheadCtx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_WIDTH);
-	steeleelCtx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+	steelheadCtx.clear();
+	steeleelCtx.clear();
 }
 
 /** clearStage()
@@ -781,10 +973,14 @@ function clearStage() {
 	$('.drizzler-container').remove();
 	$('.stage-object').remove();
 	$('#canvas-rail').remove();
+	tempDrawingCtx.clear();
+	drizzlerLinkCtx.clear();
+	$voronoiCanvas.removeAttr('voronoi-target');
+	voronoiCtx.clear();
 	clearCanvas();
 	$stageContainer.css({
-		left: `${CANVAS_VIEW_WIDTH / 2}px`,
-		top: `${CANVAS_VIEW_HEIGHT / 2}px`,
+		left: `${canvasSetting.canvasWidth / 2}px`,
+		top: `${canvasSetting.canvasHeight / 2}px`,
 		transformOrigin: 'center',
 		transform: `translate(-50%, -50%)`
 	});
@@ -803,8 +999,8 @@ function loadStage(options) {
 	// y座標マップを読み込み直す
 	ymapReady = false;
 	$.loadImage(`./assets/img/stage/ymap/${options.stage}.png`).then((img) => {
-		ymapCtx.drawImage(img, 0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
-		ymapImagedata = ymapCtx.getImageData(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+		ymapCtx.drawImage(img, 0, 0, STAGE_WIDTH, STAGE_HEIGHT);
+		ymapImagedata = ymapCtx.getImageData(0, 0, STAGE_WIDTH, STAGE_HEIGHT);
 		ymapReady = true;
 		if (ymapReadyFuncs.length) {
 			ymapReadyFuncs.forEach((fn) => {
@@ -1102,7 +1298,7 @@ function checkHTCQuality() {
 /** updateSteelEelCanvas()
  */
 function updateSteelEelCanvas() {
-	steeleelCtx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+	steeleelCtx.clearRect(0, 0, STAGE_WIDTH, STAGE_HEIGHT);
 	steeleelCtx.strokeStyle = '#16531b';
 	steeleelCtx.lineWidth = 4;
 	steeleelCtx.beginPath();
@@ -1119,11 +1315,11 @@ function updateSteelEelCanvas() {
 /** updateSteelheadCanvas()
  */
 function updateSteelheadCanvas() {
-	steelheadCtx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+	steelheadCtx.clearRect(0, 0, STAGE_WIDTH, STAGE_HEIGHT);
 	$('.stage-object.steelhead').each((i, elm) => {
 		if (ymapReady) {
 			const offset = $(elm).getXY();
-			if (0 <= offset.x && offset.x <= CANVAS_WIDTH && 0 <= offset.y && offset.y <= CANVAS_HEIGHT) {
+			if (0 <= offset.x && offset.x <= STAGE_WIDTH && 0 <= offset.y && offset.y <= STAGE_HEIGHT) {
 				const depthValue = getDepthValueByImagedata(ymapImagedata, offset.x, offset.y);
 				const type = parseInt($(elm).attr('data-type'));
 				drawSteelheadCircle(offset.x, offset.y, type);

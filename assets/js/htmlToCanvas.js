@@ -68,6 +68,23 @@ function htmlToCanvas() {
 				viewCtx.drawImage($('#canvas-rail').get(0), -1200 * cs.stageScale, -1200 * cs.stageScale, 2400 * cs.stageScale, 2400 * cs.stageScale);
 				viewCtx.restore();
 			}
+			break;
+		case 'layer-drizzler-link':
+			viewCtx.save();
+			viewCtx.translate(cs.canvasWidth / 2 + cs.stageX, cs.canvasHeight / 2 + cs.stageY);
+			viewCtx.rotate(cs.stageRotate * Math.PI/180);
+			viewCtx.drawImage($('#canvas-drizzler-link').get(0), -1200 * cs.stageScale, -1200 * cs.stageScale, 2400 * cs.stageScale, 2400 * cs.stageScale);
+			viewCtx.restore();
+			break;
+		case 'layer-voronoi':
+			viewCtx.save();
+			viewCtx.globalCompositeOperation = 'multiply';
+			viewCtx.globalAlpha = 0.8;
+			viewCtx.translate(cs.canvasWidth / 2 + cs.stageX, cs.canvasHeight / 2 + cs.stageY);
+			viewCtx.rotate(cs.stageRotate * Math.PI/180);
+			viewCtx.drawImage($('#canvas-voronoi').get(0), -1200 * cs.stageScale, -1200 * cs.stageScale, 2400 * cs.stageScale, 2400 * cs.stageScale);
+			viewCtx.restore();
+			break;
 		case 'layer-steeleel':
 			viewCtx.save();
 			viewCtx.translate(cs.canvasWidth / 2 + cs.stageX, cs.canvasHeight / 2 + cs.stageY);

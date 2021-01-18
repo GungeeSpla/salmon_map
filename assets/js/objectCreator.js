@@ -9,6 +9,18 @@ function convert(x, z) {
 	const newZ = (z + 1200);
 	return [newX, newZ]; 
 }
+function isTideEqual(tide, obj) {
+	return (
+	   (tide === 'low'    && obj.layer === 'CoopWater_0')
+	|| (tide === 'normal' && obj.layer === 'CoopWater_1')
+	|| (tide === 'high'   && obj.layer === 'CoopWater_2'));
+}
+function isTideEqualOrMore(tide, obj) {
+	return (
+	   (tide === 'low'    && (obj.layer === 'CoopWater_2' || obj.layer === 'CoopWater_1' || obj.layer === 'CoopWater_0'))
+	|| (tide === 'normal' && (obj.layer === 'CoopWater_2' || obj.layer === 'CoopWater_1'))
+	|| (tide === 'high'   && (obj.layer === 'CoopWater_2')));
+}
 
 /** objectCreater
  */
@@ -16,21 +28,21 @@ const objectCreater = {
 	/** スポナー
 	 */
 	'Obj_CoopSpawnPointZako_1': (obj, stage, tide, maptype) => {
-		if ((tide === 'high' && (obj.layer !== 'CoopWater_2')) || (tide === 'normal' && obj.layer !== 'CoopWater_1') || (tide === 'low' && obj.layer !== 'CoopWater_0')) {
+		if (!isTideEqual(tide, obj)) {
 			return null;
 		}
 		const [x, z] = convert(obj.tx, obj.tz);
 		return $('<div class="stage-object spawner spawndir-1"></div>').cssvar('--rotate', `${obj.ry}rad`).setXY(x, z);
 	},
 	'Obj_CoopSpawnPointZako_2': (obj, stage, tide, maptype) => {
-		if ((tide === 'high' && (obj.layer !== 'CoopWater_2')) || (tide === 'normal' && obj.layer !== 'CoopWater_1') || (tide === 'low' && obj.layer !== 'CoopWater_0')) {
+		if (!isTideEqual(tide, obj)) {
 			return null;
 		}
 		const [x, z] = convert(obj.tx, obj.tz);
 		return $('<div class="stage-object spawner spawndir-2"></div>').cssvar('--rotate', `${obj.ry}rad`).setXY(x, z);
 	},
 	'Obj_CoopSpawnPointZako_3': (obj, stage, tide, maptype) => {
-		if ((tide === 'high' && (obj.layer !== 'CoopWater_2')) || (tide === 'normal' && obj.layer !== 'CoopWater_1') || (tide === 'low' && obj.layer !== 'CoopWater_0')) {
+		if (!isTideEqual(tide, obj)) {
 			return null;
 		}
 		const [x, z] = convert(obj.tx, obj.tz);
@@ -39,21 +51,21 @@ const objectCreater = {
 	/** タワー
 	 */
 	'Obj_CoopArrivalPointEnemyTower_1': (obj, stage, tide, maptype) => {
-		if ((tide === 'high' && (obj.layer !== 'CoopWater_2')) || (tide === 'normal' && obj.layer !== 'CoopWater_1') || (tide === 'low' && obj.layer !== 'CoopWater_0')) {
+		if (!isTideEqual(tide, obj)) {
 			return null;
 		}
 		const [x, z] = convert(obj.tx, obj.tz);
 		return $('<div class="stage-object stinger spawndir-1"></div>').cssvar('--rotate', `${obj.ry}rad`).setXY(x, z);
 	},
 	'Obj_CoopArrivalPointEnemyTower_2': (obj, stage, tide, maptype) => {
-		if ((tide === 'high' && (obj.layer !== 'CoopWater_2')) || (tide === 'normal' && obj.layer !== 'CoopWater_1') || (tide === 'low' && obj.layer !== 'CoopWater_0')) {
+		if (!isTideEqual(tide, obj)) {
 			return null;
 		}
 		const [x, z] = convert(obj.tx, obj.tz);
 		return $('<div class="stage-object stinger spawndir-2"></div>').cssvar('--rotate', `${obj.ry}rad`).setXY(x, z);
 	},
 	'Obj_CoopArrivalPointEnemyTower_3': (obj, stage, tide, maptype) => {
-		if ((tide === 'high' && (obj.layer !== 'CoopWater_2')) || (tide === 'normal' && obj.layer !== 'CoopWater_1') || (tide === 'low' && obj.layer !== 'CoopWater_0')) {
+		if (!isTideEqual(tide, obj)) {
 			return null;
 		}
 		const [x, z] = convert(obj.tx, obj.tz);
@@ -62,21 +74,21 @@ const objectCreater = {
 	/** カタパ
 	 */
 	'Obj_CoopArrivalPointEnemyCup_1': (obj, stage, tide, maptype) => {
-		if ((tide === 'high' && (obj.layer !== 'CoopWater_2')) || (tide === 'normal' && obj.layer !== 'CoopWater_1') || (tide === 'low' && obj.layer !== 'CoopWater_0')) {
+		if (!isTideEqual(tide, obj)) {
 			return null;
 		}
 		const [x, z] = convert(obj.tx, obj.tz);
 		return $('<div class="stage-object flyfish spawndir-1"></div>').cssvar('--rotate', `${obj.ry}rad`).setXY(x, z);
 	},
 	'Obj_CoopArrivalPointEnemyCup_2': (obj, stage, tide, maptype) => {
-		if ((tide === 'high' && (obj.layer !== 'CoopWater_2')) || (tide === 'normal' && obj.layer !== 'CoopWater_1') || (tide === 'low' && obj.layer !== 'CoopWater_0')) {
+		if (!isTideEqual(tide, obj)) {
 			return null;
 		}
 		const [x, z] = convert(obj.tx, obj.tz);
 		return $('<div class="stage-object flyfish spawndir-2"></div>').cssvar('--rotate', `${obj.ry}rad`).setXY(x, z);
 	},
 	'Obj_CoopArrivalPointEnemyCup_3': (obj, stage, tide, maptype) => {
-		if ((tide === 'high' && (obj.layer !== 'CoopWater_2')) || (tide === 'normal' && obj.layer !== 'CoopWater_1') || (tide === 'low' && obj.layer !== 'CoopWater_0')) {
+		if (!isTideEqual(tide, obj)) {
 			return null;
 		}
 		const [x, z] = convert(obj.tx, obj.tz);
@@ -85,7 +97,7 @@ const objectCreater = {
 	/** コウモリ
 	 */
 	'Obj_CoopJumpPointEnemyRocket': (obj, stage, tide, maptype) => {
-		if ((tide === 'high' && (obj.layer !== 'CoopWater_2')) || (tide === 'normal' && obj.layer !== 'CoopWater_1') || (tide === 'low' && obj.layer !== 'CoopWater_0')) {
+		if (!isTideEqual(tide, obj)) {
 			return null;
 		}
 		const [x, z] = convert(obj.tx, obj.tz);
@@ -97,7 +109,7 @@ const objectCreater = {
 	/** コンテナ
 	 */
 	'Obj_CoopIkuraBankBase': (obj, stage, tide, maptype) => {
-		if (tide !== 'low' && obj.layer === 'CoopWater_0') {
+		if (!isTideEqualOrMore(tide, obj)) {
 			return null;
 		}
 		const [x, z] = convert(obj.tx, obj.tz);
@@ -106,7 +118,7 @@ const objectCreater = {
 	/** カンケツセン
 	 */
 	'Obj_CoopSpawnGeyser': (obj, stage, tide, maptype) => {
-		if ((tide === 'high' && (obj.layer === 'CoopWater_0' || obj.layer === 'CoopWater_1')) || (tide === 'normal' && obj.layer === 'CoopWater_0')) {
+		if (!isTideEqualOrMore(tide, obj)) {
 			return null;
 		}
 		const [x, z] = convert(obj.tx, obj.tz);
@@ -115,7 +127,7 @@ const objectCreater = {
 	/** 大砲
 	 */
 	'Obj_MissilePositionVs': (obj, stage, tide, maptype) => {
-		if ((tide === 'high' && (obj.layer === 'CoopWater_0' || obj.layer === 'CoopWater_1')) || (tide === 'normal' && obj.layer === 'CoopWater_0')) {
+		if (!isTideEqualOrMore(tide, obj)) {
 			return null;
 		}
 		const [x, z] = convert(obj.tx, obj.tz);
@@ -124,16 +136,13 @@ const objectCreater = {
 	/** スタート地点
 	 */
 	'StartPos': (obj, stage, tide, maptype) => {
-		if (tide === 'low') {
-			return null;
-		}
 		const [x, z] = convert(obj.tx, obj.tz);
 		return $('<div class="stage-object startpos">'+(parseInt(obj.index) + 1)+'</div>').setXY(x, z);
 	},
 	/** ハコビヤ母艦
 	 */
 	'Obj_CoopSpawnPointBoss': (obj, stage, tide, maptype) => {
-		if ((tide === 'high' && (obj.layer !== 'CoopWater_2')) || (tide === 'normal' && obj.layer !== 'CoopWater_1') || (tide === 'low' && obj.layer !== 'CoopWater_0')) {
+		if (!isTideEqual(tide, obj)) {
 			return null;
 		}
 		const [x, z] = convert(obj.tx, obj.tz);
@@ -151,8 +160,8 @@ const objectCreater = {
 		if ($canvas.size() < 1) {
 			elementExists = false;
 			$canvas = $('<canvas id="canvas-rail"></canvas>');
-			$canvas.get(0).width = CANVAS_WIDTH;
-			$canvas.get(0).height = CANVAS_HEIGHT;
+			$canvas.get(0).width = STAGE_WIDTH;
+			$canvas.get(0).height = STAGE_HEIGHT;
 		}
 		const ctx = $canvas.get(0).getContext('2d');
 		if (obj.layer === 'CoopWater_0') {

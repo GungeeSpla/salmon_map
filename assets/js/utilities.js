@@ -2,11 +2,6 @@
 // utilities.js
 // =========================================================
 
-/** constants
- */
-const CHARCODE_a = ('a').charCodeAt(0);
-const CHARCODE_A = ('A').charCodeAt(0);
-
 /** numberToAlphabet(num)
  */
 function numberToAlphabet(num) {
