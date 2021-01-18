@@ -996,7 +996,6 @@ function autosave() {
 	const saveData = {
 		json: jsonStr,
 		thumb: thumb,
-		version: VERSION,
 		timestamp: new Date().getTime()
 	};
 	localStorage.setItem(STORAGE_KEY_AUTOSAVE, JSON.stringify(saveData));
@@ -1233,7 +1232,6 @@ function saveJSON() {
 		saveData[currentFilename] = {
 			json: jsonStr,
 			thumb: thumb,
-			version: VERSION,
 			timestamp: new Date().getTime()
 		};
 		localStorage.setItem(STORAGE_KEY_JSONSAVE, JSON.stringify(saveData));
@@ -1273,7 +1271,6 @@ function saveAsJSON() {
 			saveData[text] = {
 				json: jsonStr,
 				thumb: thumb,
-				version: VERSION,
 				timestamp: new Date().getTime()
 			};
 			localStorage.setItem(STORAGE_KEY_JSONSAVE, JSON.stringify(saveData));

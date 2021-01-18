@@ -187,7 +187,7 @@ function readJSON(json) {
 /** htmlToJSON()
  */
 function htmlToJSON() {
-	const json = {};
+	const json = { v: VERSION };
 	const cs = canvasSetting; 
 	json.cs = {
 		mt: cs.maptype,
