@@ -2,11 +2,11 @@
 // constants.js
 // =========================================================
 
-const VERSION = '0.2.0';
+const VERSION = '0.2.1';
 const STORAGE_KEY = 'salmon_map';
 const STORAGE_KEY_AUTOSAVE = 'salmon_map_autosave';
 const STORAGE_KEY_JSONSAVE = 'salmon_map_jsonsave';
-const AUTOSAVE_INTERVAL = 5000;
+const AUTOSAVE_INTERVAL = 3000;
 const CHARCODE_a = ('a').charCodeAt(0);
 const CHARCODE_A = ('A').charCodeAt(0);
 const DEFAULT_SAVEDATAOBJ = {
@@ -53,15 +53,16 @@ const LAYER_MANAGER_LIST = [
 	{ name: 'layer-startpos', target: 'StartPos' },
 	{ name: 'layer-spawner', target: 'Obj_CoopSpawnPointZako' },
 	{ name: 'layer-drizzler-link' },
-	{ name: 'layer-voronoi' },
+	{ name: 'layer-voronoi', brother: 'layer-voronoi-2' },
+	{ name: 'layer-voronoi-2', isHidden: true },
 	{ name: 'layer-drizzler', target: 'Obj_CoopJumpPointEnemyRocket' },
 	{ name: 'layer-flyfish', target: 'Obj_CoopArrivalPointEnemyCup' },
 	{ name: 'layer-stinger', target: 'Obj_CoopArrivalPointEnemyTower' },
 	{ name: 'layer-mothership', target: 'Obj_CoopSpawnPointBoss' },
 	{ name: 'layer-rail', target: 'Rail_Pink' },
-	{ name: 'layer-steelhead' },
-	{ name: 'layer-steeleel' },
-	{ name: 'layer-item' }
+	{ name: 'layer-steelhead', isHidden: true },
+	{ name: 'layer-steeleel', isHidden: true },
+	{ name: 'layer-item', isHidden: true }
 ];
 const COLORS = [
 	//'rgb(244, 67, 54)',

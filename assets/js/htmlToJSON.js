@@ -33,13 +33,16 @@ function readJSON(json) {
 	/** コウモリ */
 	ncs.onloadxml = () => {
 		if (json.dz) {
-			json.dz.forEach((def) => {
-				$('#'+def[0]).prop('checked', !!def[1]);
+			json.dz.forEach((id) => {
+				$('#'+id).prop('checked', true);
 			});
 		}
 		if (json.vt) {
 			drawVoronoi(json.vt);
 		}
+		setTimeout(() => {
+			isEnabledAutosave = true;
+		}, 100);
 	};
 
 	loadStage(ncs);
@@ -98,7 +101,7 @@ function readJSON(json) {
 			case 't':
 			{
 				addTextarea({
-					text               : def.text,
+					text               : def.t,
 					x                  : def.x,
 					y                  : def.y,
 					fontSize           : def.s,
@@ -179,8 +182,6 @@ function readJSON(json) {
 			}
 		});
 	}
-
-	isEnabledAutosave = true;
 }
 
 /** htmlToJSON()
@@ -216,8 +217,8 @@ function htmlToJSON() {
 	$('#layer-drizzler .drizzler-container').each((i, elm) => {
 		const poses = [];
 		const id = $(elm).find('input').attr('id');
-		const checked = $(elm).find('input').prop('checked') ? 1 : 0;
-		dz.push([id, checked]);
+		const checked = $(elm).find('input').prop('checked');
+		if (checked) dz.push(id);
 	});
 	if (dz.length) json.dz = dz;
 

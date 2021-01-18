@@ -25,6 +25,8 @@ let $drizzlerLinkCanvas;
 let drizzlerLinkCtx;
 let $voronoiCanvas;
 let voronoiCtx;
+let $voronoiCanvas2;
+let voronoiCtx2;
 let ymapImagedata;
 let currentFilename = '';
 let voronoi;
@@ -153,16 +155,17 @@ function init() {
 	const saveDataJSON = localStorage.getItem(STORAGE_KEY);
 	const saveDataObj = saveDataJSON ? JSON.parse(saveDataJSON) : DEFAULT_SAVEDATAOBJ;
 	const $manager = $('#object-layer-manager .selector-container');
-	let railIndex = Infinity;
 	LAYER_MANAGER_LIST.forEach((item, i) => {
-		if (item.name === 'layer-rail') {
-			railIndex = i;
-		}
 		const $layer = $('<div class="layer-object" id="' + item.name + '"></div>').css({
 			width: `${STAGE_WIDTH}px`,
 			height: `${STAGE_HEIGHT}px`
 		}).appendTo($stageContainer);
-		if (i > railIndex) {
+		if (item.name === 'layer-voronoi-2') {
+			if (!saveDataObj['checkbox-layer-voronoi']) {
+				$layer.hide();
+			}
+		}
+		if (item.isHidden) {
 			return;
 		}
 		const $div1 = $('<label draggable="false" id="label-checkbox-' + item.name + '" for="checkbox-' + item.name + '"></label>');
@@ -181,6 +184,14 @@ function init() {
 				$layer.show();
 			} else {
 				$layer.hide();
+			}
+			if (item.brother) {
+				const $layer2 = $('#'+item.brother);
+				if (val) {
+					$layer2.show();
+				} else {
+					$layer2.hide();
+				}
 			}
 			saveStorage();
 			onChangeCanvas();
@@ -245,6 +256,12 @@ function init() {
 		const $canvas = $(canvas).attr('id', 'canvas-voronoi').appendTo('#layer-voronoi');
 		$voronoiCanvas = $canvas;
 		voronoiCtx = ctx;
+	}
+	{
+		const [canvas, ctx] = createCanvas(STAGE_WIDTH, STAGE_HEIGHT);
+		const $canvas = $(canvas).attr('id', 'canvas-voronoi-2').appendTo('#layer-voronoi-2');
+		$voronoiCanvas2 = $canvas;
+		voronoiCtx2 = ctx;
 	}
 	/** ラベルをクリックしたときのイベント伝播停止 */
 	$('label,input[type=range]').each((i, elm) => {
@@ -428,6 +445,7 @@ function init() {
 		$canvasContainer.removeClass('screenshot');
 		$canvasContainer.removeClass('floorplan');
 		$canvasContainer.addClass(canvasSetting.maptype);
+		updateVoronoi();
 		saveStorage();
 	});
 
@@ -774,7 +792,7 @@ function updateDrizzlerLinkCanvas() {
 				ctx.moveTo(d1.tx + 1200, d1.tz + 1200);
 				ctx.lineTo(d2.tx + 1200, d2.tz + 1200);
 				ctx.strokeStyle = 'white';
-				ctx.lineWidth = 9;
+				ctx.lineWidth = 3;
 				ctx.stroke();
 			});
 		}
@@ -814,8 +832,19 @@ function updateDrizzlerLinkCanvas() {
 	})
 }
 
+/** updateVoronoi()
+ */
+function updateVoronoi() {
+	const id = $voronoiCanvas.attr('voronoi-target');
+	if (id) {
+		drawVoronoi(id);
+	}
+}
+
+/** drawVoronoi(id)
+ */
 function drawVoronoi(id) {
-	const ctx = voronoiCtx;
+	let ctx = voronoiCtx;
 	$voronoiCanvas.attr('voronoi-target', id);
 	const d1 = getDrizzlerObject(id);
 	const ids = [];
@@ -843,48 +872,64 @@ function drawVoronoi(id) {
 			yt: 0,
 			yb: STAGE_HEIGHT
 		});
+		voronoiCtx.clear();
+		voronoiCtx2.clear();
 		// see http://hackist.jp/?p=306
-		var new_cells = [];
-		var cell_id, halfedge_id;
-		var cellslen = diagram.cells.length;
-		for(cell_id = 0; cell_id < cellslen; cell_id++)
-		{
-			var new_cell = [];
-			var cell = diagram.cells[cell_id];
-			var halfedgelen = cell.halfedges.length;
-			for(halfedge_id = 0; halfedge_id < halfedgelen; halfedge_id++)
-			{
-				var p1 = cell.halfedges[halfedge_id].edge.va;
-				var p2 = cell.halfedges[halfedge_id].edge.vb;
-				var np1 = (halfedge_id == 0) ? cell.halfedges[halfedge_id+1].edge.va : cell.halfedges[halfedge_id-1].edge.va;
-				var np2 = (halfedge_id == 0) ? cell.halfedges[halfedge_id+1].edge.vb : cell.halfedges[halfedge_id-1].edge.vb;
-				var tmp_p = (halfedge_id == 0) ? (p1 == np1 || p1 == np2) ? p2 : p1
-											   : (p1 == np1 || p1 == np2) ? p1 : p2;
-				var new_p = {};
-				new_p.x = tmp_p.x;
-				new_p.y = tmp_p.y;
-				new_cell.push(new_p);
+		if (canvasSetting.maptype === 'floorplan') {
+			var new_cells = [];
+			var cell_id, halfedge_id;
+			var cellslen = diagram.cells.length;
+			for(cell_id = 0; cell_id < cellslen; cell_id++) {
+				var new_cell = [];
+				var cell = diagram.cells[cell_id];
+				var halfedgelen = cell.halfedges.length;
+				for(halfedge_id = 0; halfedge_id < halfedgelen; halfedge_id++) {
+					var p1 = cell.halfedges[halfedge_id].edge.va;
+					var p2 = cell.halfedges[halfedge_id].edge.vb;
+					var np1 = (halfedge_id == 0) ? cell.halfedges[halfedge_id+1].edge.va : cell.halfedges[halfedge_id-1].edge.va;
+					var np2 = (halfedge_id == 0) ? cell.halfedges[halfedge_id+1].edge.vb : cell.halfedges[halfedge_id-1].edge.vb;
+					var tmp_p = (halfedge_id == 0) ? (p1 == np1 || p1 == np2) ? p2 : p1
+												   : (p1 == np1 || p1 == np2) ? p1 : p2;
+					var new_p = {};
+					new_p.x = tmp_p.x;
+					new_p.y = tmp_p.y;
+					new_cell.push(new_p);
+				}
+				new_cells.push(new_cell);
 			}
-			new_cells.push(new_cell);
-		}
-		new_cells.forEach((cell, i) => {
-			ctx.fillStyle = [
-				'#E1FA49',
-				'#DB934F',
-				'#F263EB',
-				'#4F84DB',
-				'#5CFF7B',
-				'#E1FA49',
-				'#DB934F',
-				'#F263EB'
-			][i];	
-			ctx.beginPath();
-			cell.forEach((vertex, i) => {
-				ctx[(i === 0) ? 'moveTo' : 'lineTo'](vertex.x, vertex.y);
+			new_cells.forEach((cell, i) => {
+				ctx.fillStyle = [
+					'#E1FA49',
+					'#DB934F',
+					'#F263EB',
+					'#4F84DB',
+					'#5CFF7B',
+					'#E1FA49',
+					'#DB934F',
+					'#F263EB'
+				][i];	
+				ctx.beginPath();
+				cell.forEach((vertex, i) => {
+					ctx[(i === 0) ? 'moveTo' : 'lineTo'](vertex.x, vertex.y);
+				});
+				ctx.closePath();
+				ctx.fill();
 			});
-			ctx.closePath();
-			ctx.fill();
-		});
+		}
+		if (canvasSetting.maptype !== 'floorplan') {
+			ctx = voronoiCtx2;
+			ctx.strokeStyle = 'white';
+			ctx.lineWidth = 2 / canvasSetting.stageScale;
+			var diagramlen = diagram.edges.length;
+			for(i = 0; i < diagramlen; i++) {
+				var p1 = diagram.edges[i].va;
+				var p2 = diagram.edges[i].vb;			
+				ctx.beginPath();
+				ctx.moveTo(p1.x, p1.y);
+				ctx.lineTo(p2.x, p2.y);
+				ctx.stroke();
+			}
+		}
 	}
 }
 
@@ -977,6 +1022,7 @@ function clearStage() {
 	drizzlerLinkCtx.clear();
 	$voronoiCanvas.removeAttr('voronoi-target');
 	voronoiCtx.clear();
+	voronoiCtx2.clear();
 	clearCanvas();
 	$stageContainer.css({
 		left: `${canvasSetting.canvasWidth / 2}px`,
