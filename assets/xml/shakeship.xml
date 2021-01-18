@@ -7001,7 +7001,7 @@
           <D2 Name="Y" StringValue="165" />
           <D2 Name="Z" StringValue="-52.5" />
         </C1>
-        <A0 Name="UnitConfigName" StringValue="Obj_CoopSpawnGeyser" />
+        <A0 Name="UnitConfigName" StringValue="Tmp" />
       </C1>
       <C1>
         <A0 Name="Id" StringValue="obj7642" />
