@@ -940,7 +940,7 @@ function loadJSON() {
 		$item.find('.data-delete').get(0).onclick = (e) => {
 			if (window.confirm(getLang('confirm-delete'))) {
 				if (data.isAutoSave) {
-					localStorage.setItem(STORAGE_KEY_AUTOSAVE, null);
+					localStorage.removeItem(STORAGE_KEY_AUTOSAVE);
 				} else {
 					delete saveData[data.title];
 					localStorage.setItem(STORAGE_KEY_JSONSAVE, JSON.stringify(saveData));
