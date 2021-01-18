@@ -769,7 +769,7 @@ function autosave() {
 /** clearCanvas()
  */
 function clearCanvas() {
-	$('#layer-weapon,#layer-text,#layer-image,#layer-drawing').empty();
+	$('#layer-item').empty();
 	$('#layer-steeleel .stage-object,#layer-steelhead .stage-object').remove();
 }
 
@@ -1404,6 +1404,8 @@ function addWeapon(options = {}) {
 	const weaponData = WEAPON[`weapon-${options.id}`];
 	const weaponImgDir = (options.width <= 128) ? 'weapon' : 'weapon-big';
 	const $weaponContainer = $('<div class="weapon-container" data-weapon-id="'+options.id+'" style="width: '+options.width+'px; height: '+options.height+'px;"><img src="./assets/img/'+weaponImgDir+'/'+options.id+'.png"><div class="range-container"><div class="range-line"></div><div class="v-range-line"></div><div class="range-end"></div><div class="range-far"></div><div class="v-range-end"></div><div class="v-range-far"></div><div class="range-near-end"></div><div class="range-blast"></div><div class="range-handle"></div></div></div>')
+	.attr('item-type', 'weapon')
+	.addClass('added-item')
 	.data('size', 'small')
 	.cssvar('--range', (weaponData.range / 10 * 50) + 'px')
 	.cssvar('--blast', (weaponData.blast / 10 * 50 * 2) + 'px')
@@ -1411,7 +1413,7 @@ function addWeapon(options = {}) {
 	.cssvar('--range-far', (weaponData.rangeFar / 10 * 50) + 'px')
 	.cssvar('--v-range', (weaponData.vRange / 10 * 50) + 'px')
 	.cssvar('--v-range-far', (weaponData.vRangeFar / 10 * 50) + 'px')
-	.appendTo('#layer-weapon')
+	.appendTo('#layer-item')
 	.setXY(options.x, options.y)
 	.myDraggable({
 		parentType: 'stage'
@@ -1476,7 +1478,9 @@ function addImage(options = {}) {
 		initialRotate: - canvasSetting.stageRotate
 	}, options);
 	const $imgContainer = $('<div class="image-container" style="width: '+options.width+'px; height: '+options.height+'px;"><img src="'+options.src+'"></div>')
-	.appendTo('#layer-image')
+	.attr('item-type', 'image')
+	.addClass('added-item')
+	.appendTo('#layer-item')
 	.setXY(options.x, options.y)
 	.myDraggable({
 		parentType: 'stage'
@@ -1510,11 +1514,13 @@ function addTextarea(options = {}) {
 	const $textarea = $('<textarea>' + options.text + '</textarea>');
 	const $draggableArea = $('<div></div>');
 	$textareaContainer
+	.attr('item-type', 'text')
+	.addClass('added-item')
 	.elmvar('isFirstEdit', true)
 	.setXY(options.x, options.y)
 	.append($textarea)
 	.append($draggableArea)
-	.appendTo('#layer-text')
+	.appendTo('#layer-item')
 	.myDraggable({ parentType: 'stage' })
 	.onDoubleClick((elm) => {
 		$textareaContainer.addClass('mydraggable-disable');

@@ -66,6 +66,8 @@ function determineDrawingCommon(options) {
 	$.extend(ctx, options.params);
 	const $drawing = $('<div class="drawing-container"></div>');
 	$drawing.append(canvas)
+	.attr('item-type', 'drawing')
+	.addClass('added-item')
 	.elmvar('options', options)
 	.elmvar('ctx', ctx)
 	.setWH(options.width, options.height)
@@ -95,7 +97,7 @@ function determineDrawingCommon(options) {
 		initialRotate: options.initialRotate,
 		isTransformCenter: true
 	})
-	.appendTo('#layer-drawing');
+	.appendTo('#layer-item');
 	if (!options.isJSON) {
 		$drawing.canvasToStage();
 	} else {

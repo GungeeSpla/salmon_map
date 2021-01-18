@@ -2,7 +2,7 @@
 // constants.js
 // =========================================================
 
-const VERSION = '0.0.0';
+const VERSION = '0.1.0';
 const STORAGE_KEY = 'salmon_map';
 const STORAGE_KEY_AUTOSAVE = 'salmon_map_autosave';
 const STORAGE_KEY_JSONSAVE = 'salmon_map_jsonsave';
@@ -57,10 +57,7 @@ const LAYER_MANAGER_LIST = [
 	{ name: 'layer-rail', target: 'Rail_Pink' },
 	{ name: 'layer-steelhead' },
 	{ name: 'layer-steeleel' },
-	{ name: 'layer-weapon' },
-	{ name: 'layer-image' },
-	{ name: 'layer-text' },
-	{ name: 'layer-drawing' }
+	{ name: 'layer-item' }
 ];
 const COLORS = [
 	//'rgb(244, 67, 54)',

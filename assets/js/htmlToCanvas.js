@@ -171,184 +171,187 @@ function htmlToCanvas() {
 			viewCtx.shadowBlur = 0;
 			viewCtx.shadowColor = 'rgba(0, 0, 0, 0)';
 			break;
-		/** ブキ
-		 */
-		case 'layer-weapon':
-			viewCtx.shadowColor = 'rgba(0, 0, 0, 0)';
-			$('#layer-weapon .weapon-container').each((i, elm) => {
-				const $weapon = $(elm);
-				const weaponImg = $weapon.find('img').get(0);
-				const weaponPos = $weapon.getXY();
-				const weaponCPos = stageXYToCanvasXY(weaponPos);
-				const weaponSize = $weapon.getWH();
-				const weaponRotate = $weapon.elmvar('rotate');
-				const borderWidth = $weapon.find('img').elmvar('border-width');
-				if ($weapon.find('.range-container').css('display') !== 'none') {
-					const rangeRotate = weaponRotate + $weapon.find('.range-container').elmvar('rotate');
-					const range     = canvasSetting.stageScale * parseFloat($weapon.cssvar('--range'));
-					const blast     = canvasSetting.stageScale * parseFloat($weapon.cssvar('--blast'));
-					const rangeNear = canvasSetting.stageScale * parseFloat($weapon.cssvar('--range-near'));
-					const rangeFar  = canvasSetting.stageScale * parseFloat($weapon.cssvar('--range-far'));
-					const vRange    = canvasSetting.stageScale * parseFloat($weapon.cssvar('--v-range'));
-					const vRangeFar = canvasSetting.stageScale * parseFloat($weapon.cssvar('--v-range-far'));
-					const hRangeMarginTop = (vRange < 0) ? 0 : -10; 
-					const vRangeMarginTop = 12;
+		case 'layer-item':
+			$(elm).find('.added-item').each((i, elm) => {
+				const type = $(elm).attr('item-type');
+				switch (type) {
+				/** ブキ */
+				case 'weapon':
+				{
+					const $weapon = $(elm);
+					const weaponImg = $weapon.find('img').get(0);
+					const weaponPos = $weapon.getXY();
+					const weaponCPos = stageXYToCanvasXY(weaponPos);
+					const weaponSize = $weapon.getWH();
+					const weaponRotate = $weapon.elmvar('rotate');
+					const borderWidth = $weapon.find('img').elmvar('border-width');
+					if ($weapon.find('.range-container').css('display') !== 'none') {
+						const rangeRotate = weaponRotate + $weapon.find('.range-container').elmvar('rotate');
+						const range     = canvasSetting.stageScale * parseFloat($weapon.cssvar('--range'));
+						const blast     = canvasSetting.stageScale * parseFloat($weapon.cssvar('--blast'));
+						const rangeNear = canvasSetting.stageScale * parseFloat($weapon.cssvar('--range-near'));
+						const rangeFar  = canvasSetting.stageScale * parseFloat($weapon.cssvar('--range-far'));
+						const vRange    = canvasSetting.stageScale * parseFloat($weapon.cssvar('--v-range'));
+						const vRangeFar = canvasSetting.stageScale * parseFloat($weapon.cssvar('--v-range-far'));
+						const hRangeMarginTop = (vRange < 0) ? 0 : -10; 
+						const vRangeMarginTop = 12;
+						viewCtx.save();
+						viewCtx.translate(weaponCPos.x, weaponCPos.y);
+						viewCtx.rotate((canvasSetting.stageRotate + rangeRotate) * Math.PI/180);
+						$weapon.find('.range-line').each((i, elm) => {
+							//viewCtx.fillStyle = 'rgba(255, 46, 165, .3)';
+							viewCtx.fillStyle = '#ff2ea5';
+							viewCtx.fillRect(0, -1 * canvasSetting.stageScale + hRangeMarginTop, range, 2 * canvasSetting.stageScale);
+						});
+						$weapon.find('.range-end').each((i, elm) => {
+							//viewCtx.fillStyle = 'rgba(255, 46, 165, .3)';
+							viewCtx.fillStyle = '#ff2ea5';
+							if (vRange < 0) {
+								viewCtx.fillCircle(range, hRangeMarginTop, 8 * canvasSetting.stageScale);
+							} else {
+								const w = 15;
+								const h = 30;
+								const r = 5;
+								viewCtx.fillRoundRect(range - w/2, hRangeMarginTop - h/2, w, h, r);
+							}
+						});
+						$weapon.find('.range-blast').each((i, elm) => {
+							viewCtx.fillStyle = 'rgba(255, 46, 165, .4)';
+							viewCtx.fillCircle(range, hRangeMarginTop, blast/2);
+						});
+						$weapon.find('.range-far').each((i, elm) => {
+							viewCtx.fillStyle = 'rgba(255, 46, 165, .4)';
+							const w = rangeFar;
+							const h = (vRange > 0) ? 30 : 15;
+							const r = 5;
+							viewCtx.fillRoundRect(range, hRangeMarginTop - h/2, w, h, r);
+						});
+						$weapon.find('.range-near-end').each((i, elm) => {
+							viewCtx.fillStyle = '#ff2ea5';
+							viewCtx.fillCircle(rangeNear, hRangeMarginTop, 5);
+						});
+						$weapon.find('.v-range-line').each((i, elm) => {
+							viewCtx.fillStyle = '#ff2ea5';
+							viewCtx.fillRect(0, -1 + vRangeMarginTop, vRange, 2);
+						});
+						$weapon.find('.v-range-end').each((i, elm) => {
+							viewCtx.fillStyle = '#ff2ea5';
+							viewCtx.fillCircle(vRange, vRangeMarginTop, 8);
+						});
+						$weapon.find('.v-range-far').each((i, elm) => {
+							viewCtx.fillStyle = 'rgba(255, 46, 165, .4)';
+							const w = vRangeFar;
+							const h = 15;
+							const r = 5;
+							viewCtx.fillRoundRect(vRange, vRangeMarginTop - h/2, w, h, r);
+						});
+						viewCtx.restore();
+					}
+					// ブキ画像
 					viewCtx.save();
 					viewCtx.translate(weaponCPos.x, weaponCPos.y);
-					viewCtx.rotate((canvasSetting.stageRotate + rangeRotate) * Math.PI/180);
-					$weapon.find('.range-line').each((i, elm) => {
-						//viewCtx.fillStyle = 'rgba(255, 46, 165, .3)';
-						viewCtx.fillStyle = '#ff2ea5';
-						viewCtx.fillRect(0, -1 * canvasSetting.stageScale + hRangeMarginTop, range, 2 * canvasSetting.stageScale);
-					});
-					$weapon.find('.range-end').each((i, elm) => {
-						//viewCtx.fillStyle = 'rgba(255, 46, 165, .3)';
-						viewCtx.fillStyle = '#ff2ea5';
-						if (vRange < 0) {
-							viewCtx.fillCircle(range, hRangeMarginTop, 8 * canvasSetting.stageScale);
-						} else {
-							const w = 15;
-							const h = 30;
-							const r = 5;
-							viewCtx.fillRoundRect(range - w/2, hRangeMarginTop - h/2, w, h, r);
-						}
-					});
-					$weapon.find('.range-blast').each((i, elm) => {
-						viewCtx.fillStyle = 'rgba(255, 46, 165, .4)';
-						viewCtx.fillCircle(range, hRangeMarginTop, blast/2);
-					});
-					$weapon.find('.range-far').each((i, elm) => {
-						viewCtx.fillStyle = 'rgba(255, 46, 165, .4)';
-						const w = rangeFar;
-						const h = (vRange > 0) ? 30 : 15;
-						const r = 5;
-						viewCtx.fillRoundRect(range, hRangeMarginTop - h/2, w, h, r);
-					});
-					$weapon.find('.range-near-end').each((i, elm) => {
-						viewCtx.fillStyle = '#ff2ea5';
-						viewCtx.fillCircle(rangeNear, hRangeMarginTop, 5);
-					});
-					$weapon.find('.v-range-line').each((i, elm) => {
-						viewCtx.fillStyle = '#ff2ea5';
-						viewCtx.fillRect(0, -1 + vRangeMarginTop, vRange, 2);
-					});
-					$weapon.find('.v-range-end').each((i, elm) => {
-						viewCtx.fillStyle = '#ff2ea5';
-						viewCtx.fillCircle(vRange, vRangeMarginTop, 8);
-					});
-					$weapon.find('.v-range-far').each((i, elm) => {
-						viewCtx.fillStyle = 'rgba(255, 46, 165, .4)';
-						const w = vRangeFar;
-						const h = 15;
-						const r = 5;
-						viewCtx.fillRoundRect(vRange, vRangeMarginTop - h/2, w, h, r);
+					viewCtx.rotate((canvasSetting.stageRotate + weaponRotate) * Math.PI/180);
+					viewCtx.drawImageCenterBorder(weaponImg, 0, 0, canvasSetting.stageScale * weaponSize.width, canvasSetting.stageScale * weaponSize.height, borderWidth, 'white');
+					viewCtx.restore();
+					break;
+				}
+				/** 画像 */
+				case 'image':
+				{
+					const $weapon = $(elm);
+					const weaponImg = $weapon.find('img').get(0);
+					const weaponPos = $weapon.getXY();
+					const weaponCPos = stageXYToCanvasXY(weaponPos);
+					const weaponSize = $weapon.getWH();
+					const weaponRotate = $weapon.elmvar('rotate');
+					const borderWidth = $weapon.find('img').elmvar('border-width');
+					viewCtx.save();
+					viewCtx.translate(weaponCPos.x, weaponCPos.y);
+					viewCtx.rotate((canvasSetting.stageRotate + weaponRotate) * Math.PI/180);
+					viewCtx.drawImageCenterBorder(weaponImg, 0, 0, canvasSetting.stageScale * weaponSize.width, canvasSetting.stageScale * weaponSize.height, borderWidth, 'white');
+					viewCtx.restore();
+					break;
+				}
+				/** 図形 */
+				case 'drawing':
+				{
+					const $weapon = $(elm);
+					const weaponImg = $weapon.find('canvas').get(0);
+					const weaponPos = $weapon.getXY();
+					const weaponCPos = stageXYToCanvasXY(weaponPos);
+					const weaponSize = $weapon.getWH();
+					const weaponRotate = $weapon.elmvar('rotate');
+					viewCtx.save();
+					viewCtx.translate(weaponCPos.x, weaponCPos.y);
+					viewCtx.rotate((canvasSetting.stageRotate + weaponRotate) * Math.PI/180);
+					viewCtx.drawImageCenter(weaponImg, 0, 0, canvasSetting.stageScale * weaponSize.width, canvasSetting.stageScale * weaponSize.height);
+					viewCtx.restore();
+					break;
+				}
+				/** テキスト */
+				case 'text':
+				{
+					const $elm = $(elm);
+					const $body = $('body');
+					const $text = $elm.find('textarea');
+					let width = $text.getWH().width;
+					let height = $text.getWH().height;
+					const pos1 = $elm.getXY();
+					const pos2 = stageXYToCanvasXY(pos1);
+					const scale = canvasSetting.stageScale;
+					let centerX = pos1.x;
+					let centerY = pos1.y;
+					let rotate = elm.rotate;
+					rotate += canvasSetting.stageRotate;
+					centerX = pos2.x;
+					centerY = pos2.y;
+					width = width * scale;
+					const borderWidth = $text.elmvar('border-width') * scale;
+					const borderColor = $text.elmvar('border-color');
+					const $test = $('<p>' + $text.val() + '</p>');
+					const style = window.getComputedStyle($text.get(0));
+					$test.css({
+						'margin': '0',
+						'padding': '0',
+						'position': 'fixed',
+						'left': '-100%',
+						'top': '-100%',
+						'word-break': 'break-all',
+						'white-space': 'nowrap',
+						'line-height': style.lineHeight,
+						'letter-spacing': style.letterSpacing,
+						'font-size': style.fontSize,
+						'font-family': style.fontFamily,
+						'font-weight': style.fontWeight
+					}).appendTo('body');
+					const lineHeight = $test.height();
+					$test.remove();
+
+					viewCtx.save();
+					viewCtx.translate(centerX, centerY);
+					viewCtx.rotate(rotate * Math.PI/180);
+					const fontSize = scale * parseFloat(style.fontSize);
+					const text = $text.val();
+					const lines = text.split('\n');
+					viewCtx.fillStyle = style.color;
+					viewCtx.font = `${style.fontWeight} ${fontSize}px ${style.fontFamily}`;
+					viewCtx.textAlign = 'left';
+					viewCtx.textBaseline = 'middle';
+					viewCtx.strokeStyle = borderColor || 'white';
+					viewCtx.lineWidth = borderWidth * 2.5;
+					viewCtx.lineJoin = 'round';//'miter';
+					['strokeText', 'fillText'].forEach((draw) => {
+						let x = 0;
+						let y = lineHeight / 2;
+						lines.forEach((line) => {
+							viewCtx[draw](line, x - width / 2, y - height / 2);
+							y += lineHeight;
+						});
 					});
 					viewCtx.restore();
+					break;
 				}
-				// ブキ画像
-				viewCtx.save();
-				viewCtx.translate(weaponCPos.x, weaponCPos.y);
-				viewCtx.rotate((canvasSetting.stageRotate + weaponRotate) * Math.PI/180);
-				viewCtx.drawImageCenterBorder(weaponImg, 0, 0, canvasSetting.stageScale * weaponSize.width, canvasSetting.stageScale * weaponSize.height, borderWidth, 'white');
-				viewCtx.restore();
-			});
-			break;
-		/** 画像
-		 */
-		case 'layer-image':
-			$('#layer-image .image-container').each((i, elm) => {
-				const $weapon = $(elm);
-				const weaponImg = $weapon.find('img').get(0);
-				const weaponPos = $weapon.getXY();
-				const weaponCPos = stageXYToCanvasXY(weaponPos);
-				const weaponSize = $weapon.getWH();
-				const weaponRotate = $weapon.elmvar('rotate');
-				const borderWidth = $weapon.find('img').elmvar('border-width');
-				viewCtx.save();
-				viewCtx.translate(weaponCPos.x, weaponCPos.y);
-				viewCtx.rotate((canvasSetting.stageRotate + weaponRotate) * Math.PI/180);
-				viewCtx.drawImageCenterBorder(weaponImg, 0, 0, canvasSetting.stageScale * weaponSize.width, canvasSetting.stageScale * weaponSize.height, borderWidth, 'white');
-				viewCtx.restore();
-			});
-			break;
-		/** テキスト
-		 */
-		case 'layer-text':
-			$('#layer-text .textarea-container').each((i, elm) => {
-				const $elm = $(elm);
-				const $body = $('body');
-				const $text = $elm.find('textarea');
-				let width = $text.getWH().width;
-				let height = $text.getWH().height;
-				const pos1 = $elm.getXY();
-				const pos2 = stageXYToCanvasXY(pos1);
-				const scale = canvasSetting.stageScale;
-				let centerX = pos1.x;
-				let centerY = pos1.y;
-				let rotate = elm.rotate;
-				rotate += canvasSetting.stageRotate;
-				centerX = pos2.x;
-				centerY = pos2.y;
-				width = width * scale;
-				const borderWidth = $text.elmvar('border-width') * scale;
-				const borderColor = $text.elmvar('border-color');
-				const $test = $('<p>' + $text.val() + '</p>');
-				const style = window.getComputedStyle($text.get(0));
-				$test.css({
-					'margin': '0',
-					'padding': '0',
-					'position': 'fixed',
-					'left': '-100%',
-					'top': '-100%',
-					'word-break': 'break-all',
-					'white-space': 'nowrap',
-					'line-height': style.lineHeight,
-					'letter-spacing': style.letterSpacing,
-					'font-size': style.fontSize,
-					'font-family': style.fontFamily,
-					'font-weight': style.fontWeight
-				}).appendTo('body');
-				const lineHeight = $test.height();
-				$test.remove();
-
-				viewCtx.save();
-				viewCtx.translate(centerX, centerY);
-				viewCtx.rotate(rotate * Math.PI/180);
-				const fontSize = scale * parseFloat(style.fontSize);
-				const text = $text.val();
-				const lines = text.split('\n');
-				viewCtx.fillStyle = style.color;
-				viewCtx.font = `${style.fontWeight} ${fontSize}px ${style.fontFamily}`;
-				viewCtx.textAlign = 'left';
-				viewCtx.textBaseline = 'middle';
-				viewCtx.strokeStyle = borderColor || 'white';
-				viewCtx.lineWidth = borderWidth * 2.5;
-				viewCtx.lineJoin = 'round';//'miter';
-				['strokeText', 'fillText'].forEach((draw) => {
-					let x = 0;
-					let y = lineHeight / 2;
-					lines.forEach((line) => {
-						viewCtx[draw](line, x - width / 2, y - height / 2);
-						y += lineHeight;
-					});
-				});
-				viewCtx.restore();
-			});
-			break;
-		/** 図形 */
-		case 'layer-drawing':
-			$('#layer-drawing .drawing-container').each((i, elm) => {
-				const $weapon = $(elm);
-				const weaponImg = $weapon.find('canvas').get(0);
-				const weaponPos = $weapon.getXY();
-				const weaponCPos = stageXYToCanvasXY(weaponPos);
-				const weaponSize = $weapon.getWH();
-				const weaponRotate = $weapon.elmvar('rotate');
-				viewCtx.save();
-				viewCtx.translate(weaponCPos.x, weaponCPos.y);
-				viewCtx.rotate((canvasSetting.stageRotate + weaponRotate) * Math.PI/180);
-				viewCtx.drawImageCenter(weaponImg, 0, 0, canvasSetting.stageScale * weaponSize.width, canvasSetting.stageScale * weaponSize.height);
-				viewCtx.restore();
+				}
 			});
 			break;
 		}

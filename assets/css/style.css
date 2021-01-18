@@ -336,6 +336,9 @@ h2 {
 		#layer-steeleel {
 			z-index: 11;
 		}
+		#layer-item {
+			z-index: 12;
+		}
 		.stage-object.eel {
 			position: absolute;
 			left: 0;
