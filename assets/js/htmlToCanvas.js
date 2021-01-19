@@ -309,10 +309,12 @@ function htmlToCanvas() {
 					const $weapon = $(elm);
 					const weaponImg = $weapon.find('canvas').get(0);
 					const weaponPos = $weapon.getXY();
+					const weaponOpacity = parseFloat($weapon.css('opacity'));
 					const weaponCPos = stageXYToCanvasXY(weaponPos);
 					const weaponSize = $weapon.getWH();
 					const weaponRotate = $weapon.elmvar('rotate');
 					viewCtx.save();
+					viewCtx.globalAlpha = weaponOpacity;
 					viewCtx.translate(weaponCPos.x, weaponCPos.y);
 					viewCtx.rotate((canvasSetting.stageRotate + weaponRotate) * Math.PI/180);
 					viewCtx.drawImageCenter(weaponImg, 0, 0, canvasSetting.stageScale * weaponSize.width, canvasSetting.stageScale * weaponSize.height);
@@ -325,6 +327,7 @@ function htmlToCanvas() {
 					const $elm = $(elm);
 					const $body = $('body');
 					const $text = $elm.find('textarea');
+					const options = $elm.elmvar('options');
 					let width = $text.getWH().width;
 					let height = $text.getWH().height;
 					const pos1 = $elm.getXY();
@@ -337,8 +340,8 @@ function htmlToCanvas() {
 					centerX = pos2.x;
 					centerY = pos2.y;
 					width = width * scale;
-					const borderWidth = $text.elmvar('border-width') * scale;
-					const borderColor = $text.elmvar('border-color');
+					const borderWidth = options.borderWidth * scale;
+					const borderColor = options.borderColor;
 					const $test = $('<p>' + $text.val() + '</p>');
 					const style = window.getComputedStyle($text.get(0));
 					$test.css({
@@ -364,7 +367,7 @@ function htmlToCanvas() {
 					const fontSize = scale * parseFloat(style.fontSize);
 					const text = $text.val();
 					const lines = text.split('\n');
-					viewCtx.fillStyle = style.color;
+					viewCtx.fillStyle = options.textColor;
 					viewCtx.font = `${style.fontWeight} ${fontSize}px ${style.fontFamily}`;
 					viewCtx.textAlign = 'left';
 					viewCtx.textBaseline = 'middle';

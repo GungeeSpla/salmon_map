@@ -70,6 +70,7 @@ function determineDrawingCommon(options) {
 	.addClass('added-item')
 	.elmvar('options', options)
 	.elmvar('ctx', ctx)
+	.css('opacity', options.params.toolSetting.opacity)
 	.setWH(options.width, options.height)
 	.setXY(options.x, options.y)
 	.myDraggable({
@@ -623,6 +624,14 @@ const canvasTools = {
 				const pos = parseIntVec(pageXYToCanvasXY(getPageXY(e)));
 				const move = (currentPath.length >= 2) ? getDistance(currentPath[currentPath.length - 2], pos) : Infinity;
 				if (move < 20 && timeDif < 300) {
+					currentPath.pop();
+					const p1 = currentPath[0];
+					const p2 = currentPath[currentPath.length - 1];
+					const d = getDistance(p1, p2);
+					if (d < 15) {
+						p2.x = p1.x;
+						p2.y = p1.y;
+					}
 					determineDrawing();
 					currentPath = [];
 					isDown = false;
@@ -642,9 +651,29 @@ const canvasTools = {
 				if (isDown) {
 					isMove = true;
 					const pos = parseIntVec(pageXYToCanvasXY(getPageXY(e)));
-					const lastVertex = currentPath[currentPath.length - 1];
-					lastVertex.x = pos.x;
-					lastVertex.y = pos.y;
+					const activeVertex = currentPath[currentPath.length - 1];
+					if (isShiftDown) {
+						const lastVertex = currentPath[currentPath.length - 2];
+						const xsign = Math.sign(pos.x - lastVertex.x);
+						const ysign = Math.sign(pos.y - lastVertex.y);
+						const r = Math.min(Math.abs(pos.x - lastVertex.x), Math.abs(pos.y - lastVertex.y));
+						const ps = [];
+						ps[0] = { x: lastVertex.x, y: pos.y };
+						ps[1] = { x: pos.x, y: lastVertex.y };
+						ps[2] = { x: lastVertex.x + xsign * r, y: lastVertex.y + ysign * r };
+						ps[0].d = getDistance(ps[0], pos);
+						ps[1].d = getDistance(ps[1], pos);
+						ps[2].d = getDistance(ps[2], pos);
+						ps.sort((a, b) => {
+							return (a.d > b.d) ? 1 : -1;
+						});
+						const p = ps[0];
+						activeVertex.x = p.x;
+						activeVertex.y = p.y;
+					} else {
+						activeVertex.x = pos.x;
+						activeVertex.y = pos.y;
+					}
 					tempDrawingCtx.path = currentPath;
 					self.update(tempDrawingCtx);
 				}

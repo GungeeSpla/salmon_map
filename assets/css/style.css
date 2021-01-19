@@ -143,8 +143,10 @@ h2 {
 	#desc-area p {
 		margin: 20px 0;
 	}
+	#desc-area du {
+		text-decoration: underline dotted var(--color-text);
+	}
 	#desc-area u {
-		/*text-decoration: underline dotted var(--color-text);*/
 		font-weight: bold;
 		text-decoration: none;
     	background: linear-gradient(transparent 70%, #ffce87 70%);
@@ -1057,6 +1059,7 @@ h2 {
 		margin: 10px 0;
 	}
 /** スマホ向け */
+/*
 @media screen and (max-width:600px) {
 	body {
 		margin: 0;
@@ -1071,3 +1074,4 @@ h2 {
 		transform-origin: left top;
 	}
 }
+*/

@@ -49,7 +49,8 @@ let toolSetting = {
 	lineColor: 'rgb(0, 0, 0)',
 	borderWidth: 4,
 	borderColor: 'rgb(255, 255, 255)',
-	fillColor: 'transparent'
+	fillColor: 'transparent',
+	opacity: 1
 };
 let textSetting = {
 	fontFamily: 'sans-serif',
@@ -59,6 +60,7 @@ let textSetting = {
 let isEnabledAutosave = true;
 let autosaveTimerId;
 let currentTool = 'select';
+let isShiftDown = false;
 
 /** DOMContentLoaded
  */
@@ -71,13 +73,25 @@ window.addEventListener('DOMContentLoaded', () => {
 	}
 });
 
+window.addEventListener('keydown', (e) => {
+	if (e.keyCode === 16) {
+		isShiftDown = true;
+	}
+});
+
+window.addEventListener('keyup', (e) => {
+	if (e.keyCode === 16) {
+		isShiftDown = false;
+	}
+});
+
 /** init
  */
 function init() {
 
 	/** 開発用要素の削除 */
 	$('.hidden-in-production').remove();
-	
+
 	/** Webフォントの読み込み */
 	// @see http://ithat.me/2016/12/10/js-web-font-load-start-complete-detection-web-font-loader
 	WebFont.load({
@@ -404,25 +418,6 @@ function init() {
 			});
 		}
 	});
-	
-	/** 線の太さ */
-	{
-	
-		const $range = $('#input-range-line-width');
-		const $text = $('#input-text-line-width');
-		$range.myOn('input', (e) => {
-			const val = parseInt($range.val());
-			$text.val(val);
-			toolSetting.lineWidth = val;
-		});
-		$text.myOn('input', (e) => {
-			const val = parseInt($text.val());
-			$range.val(val);
-			toolSetting.lineWidth = val;
-		});
-		$range.val(toolSetting.lineWidth);
-		$text.val(toolSetting.lineWidth);
-	}
 
 	/** ステージ/潮位/マップタイプの変更 */
 	$('#stage-selector input[name=stage],#stage-selector input[name=tide]').myOn('change', () => {
@@ -493,7 +488,8 @@ function init() {
 		['text-color', 'textColor'],
 		['text-border-color', 'borderColor']
 	].forEach((def) => {
-		const setting = def[0].includes('text') ? textSetting : toolSetting;
+		const isText = def[0].includes('text');
+		const setting = isText ? textSetting : toolSetting;
 		$('#input-text-'+def[0]).val(setting[def[1]]).paletteColorPicker({
 			colors: COLORS,
 			custom_class: 'double',
@@ -507,6 +503,51 @@ function init() {
 				} else {
 					$('[data-target='+def[0]+']').removeClass('transparent');
 				}
+				const $selected = $('.selected').eq(0);
+				if ($selected.get(0)) {
+					if (isText) {
+						if ($selected.hasClass('textarea-container')) {
+							switch (def[1]) {
+								case 'textColor': {
+									const options = $selected.elmvar('options');
+									$selected.find('textarea').css('color', color);
+									options.textColor = color;
+									break;
+								}
+								case 'borderColor': {
+									const options = $selected.elmvar('options');
+									$selected.find('textarea').setTextBorder(options.borderWidth, color);
+									options.borderColor = color;
+									break;
+								}
+							}
+						}
+					} else {
+						if ($selected.hasClass('drawing-container')) {
+							switch (def[1]) {
+								case 'lineColor': {
+									const options = $selected.elmvar('options');
+									options.params.toolSetting.lineColor = color;
+									$selected.elmvar('myresizableOptions').resize();
+									options.textColor = color;
+									break;
+								}
+								case 'borderColor': {
+									const options = $selected.elmvar('options');
+									options.params.toolSetting.borderColor = color;
+									$selected.elmvar('myresizableOptions').resize();
+									break;
+								}
+								case 'fillColor': {
+									const options = $selected.elmvar('options');
+									options.params.toolSetting.fillColor = color;
+									$selected.elmvar('myresizableOptions').resize();
+									break;
+								}
+							}
+						}
+					}
+				}
 			}
 		}).hide();
 		if (setting[def[1]] === 'transparent') {
@@ -517,7 +558,82 @@ function init() {
 	$('#font-setting').myOn('change', function(e) {
 		const val = $(this).val();
 		textSetting.fontFamily = val;
+		const $selected = $('.selected').eq(0);
+		if ($selected.get(0)) {
+			if ($selected.hasClass('textarea-container')) {
+				const options = $selected.elmvar('options');
+				$selected.find('textarea')
+				.removeClass('font-sans-serif')
+				.removeClass('font-serif')
+				.removeClass('font-splatoon1')
+				.removeClass('font-splatoon2')
+				.addClass('font-'+val).myTrigger('input');
+				options.fontFamily = val;
+			}
+		}
 	});
+
+	/** 線の太さ */
+	{
+		const $range = $('#input-range-line-width');
+		const $text = $('#input-text-line-width');
+		$range.myOn('input', (e) => {
+			const val = parseInt($range.val());
+			$text.val(val);
+			toolSetting.lineWidth = val;
+			update(val);
+		});
+		$text.myOn('input', (e) => {
+			const val = parseInt($text.val());
+			$range.val(val);
+			toolSetting.lineWidth = val;
+			update(val);
+		});
+		$range.val(toolSetting.lineWidth);
+		$text.val(toolSetting.lineWidth);
+		function update(val) {
+			const $selected = $('.selected').eq(0);
+			if ($selected.get(0)) {
+				if ($selected.hasClass('drawing-container')) {
+					const options = $selected.elmvar('options');
+					options.params.toolSetting.lineWidth = val;
+					$selected.elmvar('myresizableOptions').resize();
+				}
+			}
+		}
+	}
+
+	/** 不透明度 */
+	{
+		const $range = $('#input-range-drawing-opacity');
+		const $text = $('#input-text-drawing-opacity');
+		$range.myOn('input', (e) => {
+			const val = parseInt($range.val());
+			$text.val(val);
+			toolSetting.opacity = val / 100;
+			$tempDrawingCanvas.css('opacity', val / 100);
+			update(val);
+		});
+		$text.myOn('input', (e) => {
+			const val = parseInt($text.val());
+			$range.val(val);
+			toolSetting.opacity = val / 100;
+			$tempDrawingCanvas.css('opacity', val / 100);
+			update(val);
+		});
+		$range.val(toolSetting.opacity * 100);
+		$text.val(toolSetting.opacity * 100);
+		function update(val) {
+			const $selected = $('.selected').eq(0);
+			if ($selected.get(0)) {
+				if ($selected.hasClass('drawing-container')) {
+					$selected.css('opacity', val / 100);
+					const options = $selected.elmvar('options');
+					options.params.toolSetting.opacity = val / 100;
+				}
+			}
+		}
+	}
 
 	/** キャンバスの拡縮 */
 	const canvasScale = 1;
@@ -616,6 +732,12 @@ function init() {
 		}
 	});
 	*/
+}
+
+/** selectCanvasTool(name)
+ */
+function selectCanvasTool(name) {
+	$('#radio-tool-'+name).prop('checked', true).myTrigger('input');
 }
 
 /** clearLocalStorage()
@@ -1533,6 +1655,7 @@ function addSteelEel(options = {}) {
 	});
 	steeleelCtx.stroke();
 	onChangeCanvas();
+	selectCanvasTool('select');
 }
 
 /** addSteelheadCircle(options)
@@ -1578,6 +1701,7 @@ function addSteelheadCircle(options = {}) {
 		});
 	}
 	onChangeCanvas();
+	selectCanvasTool('select');
 }
 
 /** drawSteelheadCircle(x, y, type)
@@ -1707,6 +1831,7 @@ function addWeapon(options = {}) {
 		$weaponContainer.find('.range-container').hide();
 	}
 	onChangeCanvas();
+	selectCanvasTool('select');
 }
 /** addImage(options)
  */
@@ -1737,6 +1862,7 @@ function addImage(options = {}) {
 	})
 	.find('img').setImageBorder(1);
 	onChangeCanvas();
+	selectCanvasTool('select');
 }
 
 /** addTextarea()
@@ -1751,6 +1877,7 @@ function addTextarea(options = {}) {
 		textColor: null,
 		borderColor: null,
 		fontFamily: null,
+		borderWidth: Math.round(2 / canvasSetting.stageScale),
 		initialRotate: - canvasSetting.stageRotate
 	}, textSetting, options);
 	const $textareaContainer = $('<div class="textarea-container" ></div>');
@@ -1783,7 +1910,8 @@ function addTextarea(options = {}) {
 	.myRotatable({
 		initialRotate: options.initialRotate,
 		isTransformCenter: true,
-	});
+	})
+	.elmvar('options', options);
 	$textarea.myOn('input', (e) => {
 		const style = window.getComputedStyle($textarea.get(0));
 		const $body = $('body');
@@ -1829,7 +1957,7 @@ function addTextarea(options = {}) {
 			width: `${maxWidth}px`,
 			height: `${maxHeight * lines.length}px`,
 		});
-		$textarea.setTextBorder(Math.round(2 / canvasSetting.stageScale), options.borderColor)
+		$textarea.setTextBorder(options.borderWidth, options.borderColor)
 	}).myOn('focusout', (e) => {
 		$textareaContainer.removeClass('mydraggable-disable');
 		$draggableArea.show();
@@ -1838,8 +1966,8 @@ function addTextarea(options = {}) {
 	.css('color', options.textColor)
 	.addClass('font-' + options.fontFamily)
 	.setTextBorder(Math.round(2 / canvasSetting.stageScale), options.borderColor)
-	.elmvar('options', options)
 	.myTrigger('input');
 	onChangeCanvas();
+	selectCanvasTool('select');
 }
 /** end */

@@ -161,7 +161,8 @@ function readJSON(json) {
 						lineColor  : def.pm.ts.lc,
 						borderWidth: def.pm.ts.bw,
 						borderColor: def.pm.ts.bc,
-						fillColor  : def.pm.ts.fc
+						fillColor  : def.pm.ts.fc,
+						opacity    : def.pm.ts.op
 					};
 				}
 				determineDrawingCommon({
@@ -315,7 +316,7 @@ function htmlToJSON() {
 			const $text = $elm.find('textarea');
 			const text = $text.val();
 			const pos = $elm.getXY();
-			const options = $text.elmvar('options');
+			const options = $elm.elmvar('options');
 			const size = parseFloat($text.css('font-size'));
 			const rotate = parseInt($elm.elmvar('rotate'));
 			const data = {
@@ -376,7 +377,8 @@ function htmlToJSON() {
 					lc: params.toolSetting.lineColor,
 					bw: params.toolSetting.borderWidth,
 					bc: params.toolSetting.borderColor,
-					fc: params.toolSetting.fillColor
+					fc: params.toolSetting.fillColor,
+					op: params.toolSetting.opacity
 				};
 				delete params.toolSetting;
 			}

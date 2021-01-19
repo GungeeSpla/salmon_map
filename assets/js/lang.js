@@ -65,6 +65,7 @@ delete|削除|Delete
 autosave|オートセーブファイル|Auto Save File
 weapon-adder-title|ブキ追加|Add Weapon
 image-adder-title|画像追加|Add Image
+tool-selector-drawing-opacity|不透明度|Opacity
 tool-selector-line-width|線の太さ|Line Width
 tool-selector-title|図形ツール|Tools
 tool-selector-select|選択|Select
