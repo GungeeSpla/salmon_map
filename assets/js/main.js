@@ -408,6 +408,8 @@ function init() {
 			canvasSetting.canvasHeight = parseInt($('#input-range-canvas-height').val());
 			$tempDrawingCanvas.get(0).width = canvasSetting.canvasWidth;
 			$tempDrawingCanvas.get(0).height = canvasSetting.canvasHeight;
+			$('html').cssvar('--canvas-width', `${canvasSetting.canvasWidth}px`);
+			$('html').cssvar('--canvas-height', `${canvasSetting.canvasHeight}px`);
 			$canvasContainer.css({
 				width: `${canvasSetting.canvasWidth}px`,
 				height: `${canvasSetting.canvasHeight}px`
@@ -467,7 +469,41 @@ function init() {
 			isRemovable: false 
 		});
 	});
-
+	const windowWidth = window.innerWidth || document.body.clientWidth || document.documentElement.clientWidth || 1280;
+	if (windowWidth > 600) {
+		$('#object-layer-manager').css('left', (windowWidth - 340) + 'px');
+		$('#object-adder').css('left', (windowWidth - 340) + 'px');
+		$('#weapon-adder').css('left', (windowWidth - 340) + 'px');
+		const canvasScale = 1;
+		$canvasContainer.elmvar('scale', canvasScale);
+		$canvasContainer.css('transform-origin', 'left top');
+		$canvasContainer.css('transform', `scale(${canvasScale})`);
+	} else {
+		const canvasScale = windowWidth / canvasSetting.canvasWidth;
+		$('html').cssvar('--canvas-scale', `${canvasScale}`);
+		$canvasContainer.elmvar('scale', canvasScale);
+		$canvasContainer.css('transform-origin', 'left top');
+		$canvasContainer.css('transform', `scale(${canvasScale})`);
+		$('#desc-area').css({
+			'padding-top': '0',
+			'margin-top': '0',
+			'width': `${windowWidth}px`,
+			'box-sizing': 'border-box',
+			'padding': '20px'
+		});
+		let y = 100;
+		$('.draggable-panel').each((i, elm) => {
+			const bounds = elm.getBoundingClientRect();
+			$(elm).setXY({
+				x: windowWidth,
+				y: y
+			});
+			y += bounds.height + 10;
+		});
+		$canvasContainer.myOn('touchmove', (e) => {
+			e.preventDefault();
+		});
+	}
 	/** レンジスライダーの動作改善 */
 	RangeTouch.setup('[type=range]');
 
@@ -635,12 +671,6 @@ function init() {
 		}
 	}
 
-	/** キャンバスの拡縮 */
-	const canvasScale = 1;
-	$canvasContainer.elmvar('scale', canvasScale);
-	$canvasContainer.css('transform-origin', 'left top');
-	$canvasContainer.css('transform', `scale(canvasScale)`);
-
 	/** ドロップ時のイベントハンドラを設定します. */
 	$('body').myOn('dragenter', (e) => {
 		e.preventDefault();
@@ -712,12 +742,6 @@ function init() {
 			transform: `translate(-50%, -50%) rotate(${canvasSetting.stageRotate}deg) scale(${canvasSetting.stageScale})`
 		});
 	});
-
-	/** パネルの位置調整 */
-	const windowWidth = window.innerWidth || document.body.clientWidth || document.documentElement.clientWidth || 1280;
-	$('#object-layer-manager').css('left', (windowWidth - 340) + 'px');
-	$('#object-adder').css('left', (windowWidth - 340) + 'px');
-	$('#weapon-adder').css('left', (windowWidth - 340) + 'px');
 
 	/** クリックした場所の座標を表示 */
 	/*
@@ -1217,6 +1241,8 @@ function loadStage(options) {
 	if (typeof options.canvasWidth !== 'undefined') {
 		canvasSetting.canvasWidth = options.canvasWidth;
 		canvasSetting.canvasHeight = options.canvasHeight;
+		$('html').cssvar('--canvas-width', `${canvasSetting.canvasWidth}px`);
+		$('html').cssvar('--canvas-height', `${canvasSetting.canvasHeight}px`);
 		$('#input-range-canvas-width,#input-text-canvas-width').val(canvasSetting.canvasWidth);
 		$('#input-range-canvas-height,#input-text-canvas-height').val(canvasSetting.canvasHeight).myTrigger('input');
 	}

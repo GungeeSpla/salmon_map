@@ -342,9 +342,9 @@
 			if (!e.isForced && options.startif) {
 				const ret = $.checkElementBelowCavnas(e, false);
 				const event = document.createEvent('Event');
-				event.initEvent('mousedown', false, true);
-				event.pageX = e.pageX;
-				event.pageY = e.pageY;
+				event.initEvent(e.type, false, true);
+				event.pageX = mousePos.x;
+				event.pageY = mousePos.y;
 				event.isForced = true;
 				if (ret) {
 					ret.get(0).dispatchEvent(event);

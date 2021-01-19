@@ -9,6 +9,9 @@ html {
 	--color-theme-1-a: rgba(244, 57, 64, .5);
 	--color-theme-1-b: rgba(244, 57, 64, .1);
 	--color-theme-1-c: rgb(216, 37, 44);
+	--canvas-width: 800px;
+	--canvas-height: 800px;
+	--canvas-scale: 1;
 	--stage-rotate: 0deg;
 }
 body, div, p, span, h1, h2, h3, h4, h5, input {
@@ -1059,19 +1062,22 @@ h2 {
 		margin: 10px 0;
 	}
 /** スマホ向け */
-/*
 @media screen and (max-width:600px) {
 	body {
 		margin: 0;
 	}
+	h1 {
+		font-size: 20px;
+	}
+	h2 {
+		font-size: 18px;
+		padding: 18px 0;
+	}
 	#canvas-area {
 		display: block;
+		height: calc(var(--canvas-height) * var(--canvas-scale));
 	}
 	#canvas-container {
-		overflow: auto;
-		--canavs-scale: 0.5;
-		transform: scale(0.5);
-		transform-origin: left top;
+		/*overflow: hidden;*/
 	}
 }
-*/
