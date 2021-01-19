@@ -299,15 +299,6 @@ h2 {
 			transform: translate(-50%, -50%) rotate(calc(0deg - var(--stage-rotate)));
 		}
 		/** コウモリ */
-		#layer-voronoi {
-			mix-blend-mode: multiply;
-			opacity: 0.8;
-		}
-		.screenshot #layer-voronoi,
-		.depthmap #layer-voronoi {
-			mix-blend-mode: overlay;
-			opacity: 0;
-		}
 		#layer-drizzler > div {
 			position: absolute;
 			left: 0;

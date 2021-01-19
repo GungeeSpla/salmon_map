@@ -2,7 +2,7 @@
 // constants.js
 // =========================================================
 
-const VERSION = '0.3.1';
+const VERSION = '0.3.2';
 const STORAGE_KEY = 'salmon_map';
 const STORAGE_KEY_AUTOSAVE = 'salmon_map_autosave';
 const STORAGE_KEY_JSONSAVE = 'salmon_map_jsonsave';
@@ -53,8 +53,7 @@ const LAYER_MANAGER_LIST = [
 	{ name: 'layer-startpos', target: 'StartPos' },
 	{ name: 'layer-spawner', target: 'Obj_CoopSpawnPointZako' },
 	{ name: 'layer-drizzler-link' },
-	{ name: 'layer-voronoi', brother: 'layer-voronoi-2' },
-	{ name: 'layer-voronoi-2', isHidden: true },
+	{ name: 'layer-voronoi' },
 	{ name: 'layer-drizzler', target: 'Obj_CoopJumpPointEnemyRocket' },
 	{ name: 'layer-flyfish', target: 'Obj_CoopArrivalPointEnemyCup' },
 	{ name: 'layer-stinger', target: 'Obj_CoopArrivalPointEnemyTower' },

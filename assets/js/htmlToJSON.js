@@ -37,14 +37,15 @@ function readJSON(json) {
 				$('#'+id).prop('checked', true);
 			});
 		}
-		if (json.vt) {
-			drawVoronoi(json.vt);
-		}
 		setTimeout(() => {
 			isEnabledAutosave = true;
 		}, 100);
 	};
-
+	ncs.onloadxmlimg = () => {
+		if (json.vt) {
+			drawVoronoi(json.vt);
+		}
+	}
 	loadStage(ncs);
 
 	/** ヘビ */

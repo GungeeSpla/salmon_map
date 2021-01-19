@@ -19,7 +19,7 @@ function htmlToCanvas() {
 	viewCtx.save();
 	viewCtx.translate(cs.canvasWidth / 2 + cs.stageX, cs.canvasHeight / 2 + cs.stageY);
 	viewCtx.rotate(cs.stageRotate * Math.PI/180);
-	viewCtx.drawImage($('#stage-image').get(0), -1200 * cs.stageScale, -1200 * cs.stageScale, 2400 * cs.stageScale, 2400 * cs.stageScale);
+	viewCtx.drawImage($('#canvas-stage').get(0), -1200 * cs.stageScale, -1200 * cs.stageScale, 2400 * cs.stageScale, 2400 * cs.stageScale);
 	viewCtx.restore();
 
 	/** レイヤー */
@@ -31,6 +31,7 @@ function htmlToCanvas() {
 			return;
 		}
 		switch (id) {
+		/** スタート地点 */
 		case 'layer-startpos':
 			viewCtx.textAlign = 'center';
 			viewCtx.textBaseline = 'middle';
@@ -44,6 +45,7 @@ function htmlToCanvas() {
 				viewCtx.fillText(text, cpos.x, cpos.y);
 			});
 			break;
+		/** コンテナ/カンケツセン/大砲 */
 		case 'layer-basket':
 		case 'layer-gusher':
 		case 'layer-cannon':
@@ -60,6 +62,7 @@ function htmlToCanvas() {
 				viewCtx.restore();
 			});
 			break;
+		/** ライドレール */
 		case 'layer-rail':
 			if ($('#canvas-rail').length) {
 				viewCtx.save();
@@ -69,6 +72,7 @@ function htmlToCanvas() {
 				viewCtx.restore();
 			}
 			break;
+		/** コウモリの接続 */
 		case 'layer-drizzler-link':
 			viewCtx.save();
 			viewCtx.translate(cs.canvasWidth / 2 + cs.stageX, cs.canvasHeight / 2 + cs.stageY);
@@ -76,29 +80,17 @@ function htmlToCanvas() {
 			viewCtx.drawImage($('#canvas-drizzler-link').get(0), -1200 * cs.stageScale, -1200 * cs.stageScale, 2400 * cs.stageScale, 2400 * cs.stageScale);
 			viewCtx.restore();
 			break;
+		/** ボロノイ図 */
 		case 'layer-voronoi':
-			viewCtx.save();
-			if (canvasSetting.maptype === 'floorplan') {
-				viewCtx.globalCompositeOperation = 'multiply';
-				viewCtx.globalAlpha = 0.8;
-			} else {
-				viewCtx.globalCompositeOperation = 'overlay';
-				viewCtx.globalAlpha = 0;
-			}
-			viewCtx.translate(cs.canvasWidth / 2 + cs.stageX, cs.canvasHeight / 2 + cs.stageY);
-			viewCtx.rotate(cs.stageRotate * Math.PI/180);
-			viewCtx.drawImage($('#canvas-voronoi').get(0), -1200 * cs.stageScale, -1200 * cs.stageScale, 2400 * cs.stageScale, 2400 * cs.stageScale);
-			viewCtx.restore();
-			break;
-		case 'layer-voronoi-2':
 			if (canvasSetting.maptype !== 'floorplan') {
 				viewCtx.save();
 				viewCtx.translate(cs.canvasWidth / 2 + cs.stageX, cs.canvasHeight / 2 + cs.stageY);
 				viewCtx.rotate(cs.stageRotate * Math.PI/180);
-				viewCtx.drawImage($('#canvas-voronoi-2').get(0), -1200 * cs.stageScale, -1200 * cs.stageScale, 2400 * cs.stageScale, 2400 * cs.stageScale);
+				viewCtx.drawImage($('#canvas-voronoi').get(0), -1200 * cs.stageScale, -1200 * cs.stageScale, 2400 * cs.stageScale, 2400 * cs.stageScale);
 				viewCtx.restore();
 			}
 			break;
+		/** ヘビ */
 		case 'layer-steeleel':
 			viewCtx.save();
 			viewCtx.translate(cs.canvasWidth / 2 + cs.stageX, cs.canvasHeight / 2 + cs.stageY);
@@ -124,6 +116,7 @@ function htmlToCanvas() {
 			viewCtx.shadowBlur = 0;
 			viewCtx.shadowColor = 'rgba(0, 0, 0, 0)';
 			break;
+		/** バクダン/コウモリ/カタパ/タワー */
 		case 'layer-steelhead':
 		case 'layer-drizzler':
 		case 'layer-flyfish':
@@ -177,6 +170,7 @@ function htmlToCanvas() {
 			viewCtx.shadowBlur = 0;
 			viewCtx.shadowColor = 'rgba(0, 0, 0, 0)';
 			break;
+		/** スポナー/ハコビヤ */
 		case 'layer-mothership':
 		case 'layer-spawner':
 			viewCtx.lineCap = 'round';
@@ -202,6 +196,7 @@ function htmlToCanvas() {
 			viewCtx.shadowBlur = 0;
 			viewCtx.shadowColor = 'rgba(0, 0, 0, 0)';
 			break;
+		/** アイテム */
 		case 'layer-item':
 			$(elm).find('.added-item').each((i, elm) => {
 				const type = $(elm).attr('item-type');

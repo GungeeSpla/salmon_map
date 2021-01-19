@@ -17,6 +17,8 @@ let $tempDrawingCanvas;
 let tempDrawingCtx;
 let $ymapCanvas;
 let ymapCtx;
+let $stageCanvas;
+let stageCtx;
 let $steeleelCanvas;
 let steeleelCtx;
 let $steelheadCanvas;
@@ -25,8 +27,6 @@ let $drizzlerLinkCanvas;
 let drizzlerLinkCtx;
 let $voronoiCanvas;
 let voronoiCtx;
-let $voronoiCanvas2;
-let voronoiCtx2;
 let ymapImagedata;
 let currentFilename = '';
 let voronoi;
@@ -118,6 +118,12 @@ function init() {
 		height: `${STAGE_HEIGHT}px`,
 		transformOrigin: 'center'
 	});
+	{
+		const [canvas, ctx] = createCanvas(STAGE_WIDTH, STAGE_HEIGHT);
+		const $canvas = $(canvas).attr('id', 'canvas-stage').appendTo($stageContainer);
+		$stageCanvas = $canvas;
+		stageCtx = ctx;
+	}
 	/*
 	.myDraggable({
 		drag: () => {
@@ -174,11 +180,6 @@ function init() {
 			width: `${STAGE_WIDTH}px`,
 			height: `${STAGE_HEIGHT}px`
 		}).appendTo($stageContainer);
-		if (item.name === 'layer-voronoi-2') {
-			if (!saveDataObj['checkbox-layer-voronoi']) {
-				$layer.hide();
-			}
-		}
 		if (item.isHidden) {
 			return;
 		}
@@ -199,13 +200,8 @@ function init() {
 			} else {
 				$layer.hide();
 			}
-			if (item.brother) {
-				const $layer2 = $('#'+item.brother);
-				if (val) {
-					$layer2.show();
-				} else {
-					$layer2.hide();
-				}
+			if (item.name === 'layer-voronoi') {
+				updateVoronoi();
 			}
 			saveStorage();
 			onChangeCanvas();
@@ -270,12 +266,6 @@ function init() {
 		const $canvas = $(canvas).attr('id', 'canvas-voronoi').appendTo('#layer-voronoi');
 		$voronoiCanvas = $canvas;
 		voronoiCtx = ctx;
-	}
-	{
-		const [canvas, ctx] = createCanvas(STAGE_WIDTH, STAGE_HEIGHT);
-		const $canvas = $(canvas).attr('id', 'canvas-voronoi-2').appendTo('#layer-voronoi-2');
-		$voronoiCanvas2 = $canvas;
-		voronoiCtx2 = ctx;
 	}
 	/** ラベルをクリックしたときのイベント伝播停止 */
 	$('label,input[type=range]').each((i, elm) => {
@@ -428,7 +418,12 @@ function init() {
 	});
 	$('#stage-selector input[name=maptype]').myOn('change', () => {
 		canvasSetting.maptype = $('input[type=radio][name=maptype]:checked').val() || 'depthmap';
-		$('#stage-image').attr('src', `./assets/img/stage/${canvasSetting.maptype}/${canvasSetting.stage}-${canvasSetting.tide}.png`);
+		$.loadImage(`./assets/img/stage/${canvasSetting.maptype}/${canvasSetting.stage}-${canvasSetting.tide}.png`).then((img) => {
+			stageCtx.img = img;
+			stageCtx.clear();
+			stageCtx.drawImage(img, 0, 0);
+			updateVoronoi();
+		});
 		$('#layer-basket img').each((i, elm) => {
 			$(elm).attr('src', `./assets/img/stage-object/mapicon-${canvasSetting.maptype}-basket.png`);
 		});
@@ -442,7 +437,6 @@ function init() {
 		$canvasContainer.removeClass('screenshot');
 		$canvasContainer.removeClass('floorplan');
 		$canvasContainer.addClass(canvasSetting.maptype);
-		updateVoronoi();
 		saveStorage();
 	});
 
@@ -955,7 +949,7 @@ function updateDrizzlerLinkCanvas() {
 				ctx.beginPath();
 				ctx.moveTo(d1.tx + 1200, d1.tz + 1200);
 				ctx.lineTo(d2.tx + 1200, d2.tz + 1200);
-				ctx.strokeStyle = '#2196f3';
+				ctx.strokeStyle = '#0068bc';
 				ctx.lineWidth = 3;
 				ctx.stroke();
 			});
@@ -981,8 +975,11 @@ function updateDrizzlerLinkCanvas() {
 /** updateVoronoi()
  */
 function updateVoronoi() {
+	stageCtx.clear();
+	stageCtx.drawImage(stageCtx.img, 0, 0);
+	voronoiCtx.clear();
 	const id = $voronoiCanvas.attr('voronoi-target');
-	if (id) {
+	if (id && $('#checkbox-layer-voronoi').prop('checked')) {
 		drawVoronoi(id);
 	}
 }
@@ -1018,10 +1015,15 @@ function drawVoronoi(id) {
 			yt: 0,
 			yb: STAGE_HEIGHT
 		});
+		stageCtx.clear();
+		stageCtx.drawImage(stageCtx.img, 0, 0);
 		voronoiCtx.clear();
-		voronoiCtx2.clear();
 		// see http://hackist.jp/?p=306
 		if (canvasSetting.maptype === 'floorplan') {
+			ctx = stageCtx;
+			ctx.save();
+			ctx.globalAlpha = 0.6;
+			ctx.globalCompositeOperation = 'multiply';
 			var new_cells = [];
 			var cell_id, halfedge_id;
 			var cellslen = diagram.cells.length;
@@ -1046,13 +1048,16 @@ function drawVoronoi(id) {
 			new_cells.forEach((cell, i) => {
 				ctx.fillStyle = [
 					'#E1FA49',
-					'#DB934F',
-					'#F263EB',
-					'#4F84DB',
-					'#5CFF7B',
+					'#FD862C',
+					'#FB169B',
+					'#2974F2',
+					'#5EF142',
+					
 					'#E1FA49',
-					'#DB934F',
-					'#F263EB'
+					'#FD862C',
+					'#FB169B',
+					'#2974F2',
+					'#5EF142'
 				][i];	
 				ctx.beginPath();
 				cell.forEach((vertex, i) => {
@@ -1061,12 +1066,25 @@ function drawVoronoi(id) {
 				ctx.closePath();
 				ctx.fill();
 			});
+			ctx.restore();
 		}
 		if (canvasSetting.maptype !== 'floorplan') {
-			ctx = voronoiCtx2;
+			ctx = voronoiCtx;
 			ctx.strokeStyle = 'white';
-			ctx.lineWidth = 2 / canvasSetting.stageScale;
+			ctx.lineWidth = 1.5 / canvasSetting.stageScale;
+			ctx.shadowBlur = 4;
+			ctx.shadowColor = 'rgba(0, 0, 0, 0.5)';
 			var diagramlen = diagram.edges.length;
+			for(i = 0; i < diagramlen; i++) {
+				var p1 = diagram.edges[i].va;
+				var p2 = diagram.edges[i].vb;			
+				ctx.beginPath();
+				ctx.moveTo(p1.x, p1.y);
+				ctx.lineTo(p2.x, p2.y);
+				ctx.stroke();
+			}
+			ctx.shadowBlur = 0;
+			ctx.shadowColor = 'rgba(0, 0, 0, 0)';
 			for(i = 0; i < diagramlen; i++) {
 				var p1 = diagram.edges[i].va;
 				var p2 = diagram.edges[i].vb;			
@@ -1167,7 +1185,6 @@ function clearStage() {
 	drizzlerLinkCtx.clear();
 	$voronoiCanvas.removeAttr('voronoi-target');
 	voronoiCtx.clear();
-	voronoiCtx2.clear();
 	clearCanvas();
 	$stageContainer.css({
 		left: `${canvasSetting.canvasWidth / 2}px`,
@@ -1183,6 +1200,9 @@ function loadStage(options) {
 
 	$('#stage-name').text(getLang(options.stage));
 	$('#tide-name').text(getLang(options.tide+'tide'));
+
+	let isImgReady = false;
+	let isXMLReady = false;
 
 	// 現在のステージをクリアする
 	clearStage();
@@ -1211,12 +1231,22 @@ function loadStage(options) {
 	// XMLファイルの読み込み
 	stageObjectsReady = false;
 	$.loadXML(`./assets/xml/${options.stage}.xml`).then((data) => {
+		isXMLReady = true;
 		readXML(data);
 		if (options.onloadxml) options.onloadxml();
+		if (isImgReady && isXMLReady && options.onloadxmlimg) options.onloadxmlimg();
 	});
 
 	/** ステージ画像 */
-	$('#stage-image').attr('src', `./assets/img/stage/${options.maptype}/${options.stage}-${options.tide}.png`).css('display', 'block');
+	$.loadImage(`./assets/img/stage/${options.maptype}/${options.stage}-${options.tide}.png`).then((img) => {
+		isImgReady = true;
+		stageCtx.img = img;
+		stageCtx.clear();
+		stageCtx.drawImage(img, 0, 0);
+		if (options.onloadimg) options.onloadimg();
+		if (isImgReady && isXMLReady && options.onloadxmlimg) options.onloadxmlimg();
+	});
+	
 
 	/** ステージ変形 */
 	const transform = DEFAULT_MAP_TRANSFORM[`${options.stage}-${options.tide}`] || [0, 0, 0.34, 0, 75];
