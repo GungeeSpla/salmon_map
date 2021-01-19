@@ -975,6 +975,9 @@ function updateDrizzlerLinkCanvas() {
 /** updateVoronoi()
  */
 function updateVoronoi() {
+	if (!stageCtx.img) {
+		return;
+	}
 	stageCtx.clear();
 	stageCtx.drawImage(stageCtx.img, 0, 0);
 	voronoiCtx.clear();
@@ -1015,6 +1018,9 @@ function drawVoronoi(id) {
 			yt: 0,
 			yb: STAGE_HEIGHT
 		});
+		if (!stageCtx.img) {
+			return;
+		}
 		stageCtx.clear();
 		stageCtx.drawImage(stageCtx.img, 0, 0);
 		voronoiCtx.clear();
