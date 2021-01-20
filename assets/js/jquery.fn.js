@@ -97,7 +97,7 @@
 	$.fn.canvasToStage = function() {
 		const size = this.getWH();
 		const cpos = this.getXY();
-		const spos = parseIntVec(canvasXYToStageXY(cpos));
+		const spos = canvasXYToStageXY(cpos);
 		const edeg = this.elmvar('rotate');
 		const sdeg = canvasSetting.stageRotate;
 		const rszOpt = this.elmvar('myresizableOptions');
@@ -111,8 +111,8 @@
 			this.find('textarea').myTrigger('input');
 		} else {
 			this.setWH({
-				width: parseInt(size.width / canvasSetting.stageScale),
-				height: parseInt(size.height / canvasSetting.stageScale)
+				width: size.width / canvasSetting.stageScale,
+				height: size.height / canvasSetting.stageScale
 			});
 		}
 		if (drgOpt) {
@@ -128,7 +128,7 @@
 	$.fn.stageToCanvas = function() {
 		const size = this.getWH();
 		const spos = this.getXY();
-		const cpos = parseIntVec(stageXYToCanvasXY(spos));
+		const cpos = stageXYToCanvasXY(spos);
 		const edeg = this.elmvar('rotate');
 		const sdeg = canvasSetting.stageRotate;
 		const rszOpt = this.elmvar('myresizableOptions');
@@ -142,8 +142,8 @@
 			this.find('textarea').myTrigger('input');
 		} else {
 			this.setWH({
-				width: parseInt(size.width / canvasSetting.stageScale),
-				height: parseInt(size.height / canvasSetting.stageScale)
+				width: size.width / canvasSetting.stageScale,
+				height: size.height / canvasSetting.stageScale
 			});
 		}
 		if (drgOpt) {

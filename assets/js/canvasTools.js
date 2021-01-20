@@ -168,7 +168,7 @@ const canvasTools = {
 						if (vertex.y < minY) minY = vertex.y;
 					});
 				});
-				const margin = toolSetting.lineWidth;
+				const margin = Math.max(20, toolSetting.lineWidth);
 				minX -= margin;
 				minY -= margin;
 				maxX += margin;
@@ -445,10 +445,15 @@ const canvasTools = {
 			/** determineDrawing
 			 */
 			function determineDrawing(pos1, pos2) {
-				const minX = Math.min(pos1.x, pos2.x) - toolSetting.lineWidth;
-				const minY = Math.min(pos1.y, pos2.y) - toolSetting.lineWidth;
-				const maxX = Math.max(pos1.x, pos2.x) + toolSetting.lineWidth;
-				const maxY = Math.max(pos1.y, pos2.y) + toolSetting.lineWidth;
+				let minX = Math.min(pos1.x, pos2.x);
+				let minY = Math.min(pos1.y, pos2.y);
+				let maxX = Math.max(pos1.x, pos2.x);
+				let maxY = Math.max(pos1.y, pos2.y);
+				const margin = Math.max(20, toolSetting.lineWidth);
+				minX -= margin;
+				minY -= margin;
+				maxX += margin;
+				maxY += margin;
 				determineDrawingCommon($.extend(getXYWH(minX, minY, maxX, maxY), {
 					params: { pos1, pos2 },
 					toolType: 'line'
@@ -518,10 +523,15 @@ const canvasTools = {
 			/** determineDrawing
 			 */
 			function determineDrawing(pos1, pos2) {
-				const minX = Math.min(pos1.x, pos2.x) - toolSetting.lineWidth;
-				const minY = Math.min(pos1.y, pos2.y) - toolSetting.lineWidth;
-				const maxX = Math.max(pos1.x, pos2.x) + toolSetting.lineWidth;
-				const maxY = Math.max(pos1.y, pos2.y) + toolSetting.lineWidth;
+				let minX = Math.min(pos1.x, pos2.x);
+				let minY = Math.min(pos1.y, pos2.y);
+				let maxX = Math.max(pos1.x, pos2.x);
+				let maxY = Math.max(pos1.y, pos2.y);
+				const margin = Math.max(20, toolSetting.lineWidth);
+				minX -= margin;
+				minY -= margin;
+				maxX += margin;
+				maxY += margin;
 				determineDrawingCommon($.extend(getXYWH(minX, minY, maxX, maxY), {
 					params: { pos1, pos2 },
 					toolType: 'arrow'
@@ -604,7 +614,7 @@ const canvasTools = {
 					if (vertex.y > maxY) maxY = vertex.y;
 					if (vertex.y < minY) minY = vertex.y;
 				});
-				const margin = toolSetting.lineWidth;
+				const margin = Math.max(20, toolSetting.lineWidth);
 				minX -= margin;
 				minY -= margin;
 				maxX += margin;
