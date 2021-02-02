@@ -2,7 +2,7 @@
 // constants.js
 // =========================================================
 
-const VERSION = '0.3.4';
+const VERSION = '0.4.0';
 const STORAGE_KEY = 'salmon_map';
 const STORAGE_KEY_AUTOSAVE = 'salmon_map_autosave';
 const STORAGE_KEY_JSONSAVE = 'salmon_map_jsonsave';
@@ -16,6 +16,9 @@ const DEFAULT_SAVEDATAOBJ = {
 	'checkbox-layer-basket': true,
 	'checkbox-layer-cannon': true,
 	'checkbox-layer-gusher': true,
+	'checkbox-layer-node': false,
+	'checkbox-layer-node-link': false,
+	'checkbox-layer-area': false,
 	'checkbox-layer-drizzler-link': false,
 	'checkbox-layer-voronoi': false,
 	'checkbox-layer-drizzler': false,
@@ -50,6 +53,9 @@ const LAYER_MANAGER_LIST = [
 	{ name: 'layer-basket', target: 'Obj_CoopIkuraBankBase' },
 	{ name: 'layer-gusher', target: 'Obj_CoopSpawnGeyser' },
 	{ name: 'layer-cannon', target: 'Obj_MissilePositionVs'	},
+	{ name: 'layer-area', target: 'Obj_CoopGraphArea'	},
+	{ name: 'layer-node-link' },
+	{ name: 'layer-node', target: 'CoopGraphNode' },
 	{ name: 'layer-startpos', target: 'StartPos' },
 	{ name: 'layer-spawner', target: 'Obj_CoopSpawnPointZako' },
 	{ name: 'layer-drizzler-link' },

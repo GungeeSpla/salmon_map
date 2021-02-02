@@ -72,6 +72,61 @@ function htmlToCanvas() {
 				viewCtx.restore();
 			}
 			break;
+		/** メッシュ */
+		case 'layer-area':
+			viewCtx.lineCap = 'round';
+			viewCtx.lineJoin = 'round';
+			viewCtx.shadowColor = 'rgba(0, 0, 0, 0)';
+			viewCtx.shadowOffsetX = 0;
+			viewCtx.shadowOffsetY = 0;
+			viewCtx.lineWidth = 1 * cs.stageScale;
+			$(elm).find((id === 'layer-drizzler') ? 'label' : 'div').each((i, elm) => {
+				const style = window.getComputedStyle(elm);
+				const width = cs.stageScale * parseFloat(style.width);
+				const height = cs.stageScale * parseFloat(style.height);
+				const cpos = stageXYToCanvasXY(parseFloat(style.left), parseFloat(style.top));
+				viewCtx.fillStyle = style.backgroundColor;
+				viewCtx.strokeStyle = style.borderColor;
+				viewCtx.fillRect(cpos.x - width / 2, cpos.y - height / 2, width, height);
+				viewCtx.strokeRect(cpos.x - width / 2, cpos.y - height / 2, width, height);
+			});
+			viewCtx.shadowBlur = 0;
+			viewCtx.shadowColor = 'rgba(0, 0, 0, 0)';
+			break;
+		/** ノード */
+		case 'layer-node':
+			viewCtx.lineCap = 'round';
+			viewCtx.lineJoin = 'round';
+			viewCtx.shadowColor = 'rgba(0, 0, 0, 0.2)';
+			viewCtx.shadowOffsetX = 2 * cs.stageScale;
+			viewCtx.shadowOffsetY = 2 * cs.stageScale;
+			viewCtx.lineWidth = 4 * cs.stageScale;
+			$(elm).find('div').each((i, elm) => {
+				const style = window.getComputedStyle(elm);
+				const radius = cs.stageScale * parseFloat(style.width) / 2;
+				const cpos = stageXYToCanvasXY(parseFloat(style.left), parseFloat(style.top));
+				viewCtx.fillStyle = style.backgroundColor;
+				viewCtx.strokeStyle = style.borderColor;
+				viewCtx.beginPath();
+				viewCtx.arc(cpos.x, cpos.y, radius, 0, Math.PI * 2, false);
+				viewCtx.shadowBlur = 6;
+				viewCtx.shadowColor = 'rgba(0, 0, 0, 0.2)';
+				viewCtx.stroke();
+				viewCtx.shadowBlur = 0;
+				viewCtx.shadowColor = 'rgba(0, 0, 0, 0)';
+				viewCtx.fill();
+			});
+			viewCtx.shadowBlur = 0;
+			viewCtx.shadowColor = 'rgba(0, 0, 0, 0)';
+			break;
+		/** ノードの接続 */
+		case 'layer-node-link':
+			viewCtx.save();
+			viewCtx.translate(cs.canvasWidth / 2 + cs.stageX, cs.canvasHeight / 2 + cs.stageY);
+			viewCtx.rotate(cs.stageRotate * Math.PI/180);
+			viewCtx.drawImage($('#canvas-node-link').get(0), -1200 * cs.stageScale, -1200 * cs.stageScale, 2400 * cs.stageScale, 2400 * cs.stageScale);
+			viewCtx.restore();
+			break;
 		/** コウモリの接続 */
 		case 'layer-drizzler-link':
 			viewCtx.save();

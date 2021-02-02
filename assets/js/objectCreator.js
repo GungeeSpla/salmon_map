@@ -25,6 +25,30 @@ function isTideEqualOrMore(tide, obj) {
 /** objectCreater
  */
 const objectCreater = {
+	/** ノード
+	 */
+	'CoopGraphNode': (obj, stage, tide, maptype) => {
+		const json = obj.json;
+		const [x, z] = convert(obj.tx, obj.tz);
+		return $('<div class="stage-object graph-node"></div>').cssvar('--rotate', `${obj.ry}rad`).setXY(x, z);
+	},
+	/** ノード
+	 */
+	'CoopGraphNodeDangerousPos': (obj, stage, tide, maptype) => {
+		const json = obj.json;
+		const [x, z] = convert(obj.tx, obj.tz);
+		return $('<div class="stage-object graph-node"></div>').cssvar('--rotate', `${obj.ry}rad`).setXY(x, z);
+	},
+	/** メッシュ
+	 */
+	'Obj_CoopGraphArea': (obj, stage, tide, maptype) => {
+		const json = obj.json;
+		const x = json['Translate']['X'] + 1200;
+		const y = json['Translate']['Z'] + 1200;
+		const w = json['Scale']['X'] * 10;
+		const h = json['Scale']['Z'] * 10;
+		return $('<div class="stage-object graph-area"></div>').setXY(x, y).setWH(w, h);
+	},
 	/** スポナー
 	 */
 	'Obj_CoopSpawnPointZako_1': (obj, stage, tide, maptype) => {

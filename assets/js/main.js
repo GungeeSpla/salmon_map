@@ -25,6 +25,8 @@ let $steelheadCanvas;
 let steelheadCtx;
 let $drizzlerLinkCanvas;
 let drizzlerLinkCtx;
+let $nodeLinkCanvas;
+let nodeLinkCtx;
 let $voronoiCanvas;
 let voronoiCtx;
 let ymapImagedata;
@@ -258,6 +260,13 @@ function init() {
 		const $canvas = $(canvas).attr('id', 'canvas-drizzler-link').appendTo('#layer-drizzler-link');
 		$drizzlerLinkCanvas = $canvas;
 		drizzlerLinkCtx = ctx;
+	}
+	/** コウモリの駐車場接続キャンバス */
+	{
+		const [canvas, ctx] = createCanvas(STAGE_WIDTH, STAGE_HEIGHT);
+		const $canvas = $(canvas).attr('id', 'canvas-node-link').appendTo('#layer-node-link');
+		$nodeLinkCanvas = $canvas;
+		nodeLinkCtx = ctx;
 	}
 	/** ボロノイ図 */
 	{
@@ -832,6 +841,28 @@ function readXML(xml) {
 		}
 		return null;
 	}
+	function parseJSON(element) {
+		const data = {};
+		const children = element.children;
+		Array.prototype.forEach.call(children, (child, i) => {
+			let name = child.getAttribute('Name');
+			if (!name) {
+				name = i;
+				data.length = i + 1;
+			}
+			let value = child.getAttribute('StringValue');
+			if (value) {
+				const float = parseFloat(value);
+				if (!isNaN(float)) {
+					value = float;
+				}
+				data[name] = value;
+			} else {
+				data[name] = parseJSON(child);
+			}
+		});
+		return data;
+	}
 	const doc = xml.documentElement;
 	const elms = doc.querySelectorAll('Root>C1>C0>C1');
 	const objs = [];
@@ -840,6 +871,7 @@ function readXML(xml) {
 	const groupNames = [];
 	const groupCounts = {};
 	Array.prototype.forEach.call(elms, (item, i) => {
+		const json = parseJSON(item);
 		const id = sv1(item, '[Name=Id]');
 		const layer = sv1(item, '[Name=LayerConfigName]');
 		const group = sv2(item, '[Name=UnitConfigName]');
@@ -866,7 +898,7 @@ function readXML(xml) {
 		const num = groupCounts[group];
 		const data = {
 			id, num, index, layer, group, tx, ty, tz,
-			sx, sy, sz, rx, ry, rz, links
+			sx, sy, sz, rx, ry, rz, links, json
 		};
 		if (group === 'Rail_Pink') {
 			const arr = [];
@@ -906,6 +938,7 @@ function readXML(xml) {
 			}
 		});
 	});
+	updateNodeLinkCanvas();
 	updateDrizzlerLinkCanvas();
 	stageObjectsReady = true;
 	if (stageObjectsReadyFuncs.length) {
@@ -914,6 +947,49 @@ function readXML(xml) {
 		});
 		stageObjectsReadyFuncs = [];
 	}
+}
+
+/** updateNodeLinkCanvas()
+ */
+function updateNodeLinkCanvas() {
+	const ctx = nodeLinkCtx;
+	stageObjects.forEach((item) => {
+		const obj = item.json;
+		if (!obj['UnitConfigName'].includes('CoopGraphNode')) {
+			return;
+		}
+		const x = obj['Translate']['X'] + 1200;
+		const z = obj['Translate']['Z'] + 1200;
+		const links = obj['Links'];
+		if (links && Object.keys(links).length) {
+			for (let key in links) {
+				const len = links[key].length;
+				for (let i = 0; i < len; i++) {
+					const link = links[key][i];
+					const target_type = link['DefinitionName'];
+					const target_id = link['DestUnitId'];
+					const target_obj = getObject(target_id);
+					if (target_obj) {
+						const x2 = target_obj.json['Translate']['X'] + 1200;
+						const z2 = target_obj.json['Translate']['Z'] + 1200;
+						ctx.strokeStyle = '#ff5722';
+						if (target_type === 'ToGraphNodeUnidirectionalDrop') {
+							ctx.lineWidth = 4;
+							ctx.setLineDash([4, 4, 14, 4]);
+						} else {
+							ctx.lineWidth = 1;
+							ctx.setLineDash([]);
+						}
+						ctx.beginPath();
+						ctx.moveTo(x, z);
+						ctx.lineTo(x2, z2);
+						ctx.stroke();
+					}
+				}
+			};
+			ctx.setLineDash([]);
+		}
+	});
 }
 
 /** updateDrizzlerLinkCanvas()
@@ -1127,6 +1203,18 @@ function getDrizzlerObject(id) {
 	return null;
 }
 
+/** getObject(id)
+ */
+function getObject(id) {
+	const ret = [];
+	for (let i = 0; i < stageObjects.length; i++) {
+		if (stageObjects[i].id === id) {
+			return stageObjects[i];
+		}
+	}
+	return null;
+}
+
 /** selectStage()
  */
 function selectStage() {
@@ -1189,6 +1277,7 @@ function clearStage() {
 	$('#canvas-rail').remove();
 	tempDrawingCtx.clear();
 	drizzlerLinkCtx.clear();
+	nodeLinkCtx.clear();
 	$voronoiCanvas.removeAttr('voronoi-target');
 	voronoiCtx.clear();
 	clearCanvas();

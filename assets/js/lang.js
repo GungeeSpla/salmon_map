@@ -85,6 +85,9 @@ font-serif|明朝体|Serif
 font-splatoon1|スプラトゥーン1|Splatoon1
 font-splatoon2|スプラトゥーン2|Splatoon2
 object-layer-manager-title|レイヤー|Layer
+layer-node|ノード|Node
+layer-node-link|ノードの接続|Node Link
+layer-area|メッシュ|Mesh
 layer-spawner|スポナー|Spawner
 layer-drawing|図形|Drawing
 layer-text|テキスト|Text
